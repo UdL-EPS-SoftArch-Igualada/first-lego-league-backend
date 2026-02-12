@@ -26,6 +26,10 @@ public class Match {
 	@JoinColumn(name = "round_id")
 	private Round round;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "table_id")
+	private CompetitionTable competitionTable;
+
 	public Match() {}
 
 	public Long getId() {
