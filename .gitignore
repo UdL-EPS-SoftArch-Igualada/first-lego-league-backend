@@ -16,7 +16,10 @@ target/
 !.settings/java-formatter.xml
 
 ### IntelliJ IDEA ###
-.idea
+.idea/*
+!.idea/encodings.xml
+!.idea/misc.xml
+!.idea/vcs.xml
 *.iws
 *.iml
 *.ipr
