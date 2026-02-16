@@ -32,6 +32,9 @@ public class TeamSteps {
 	public void clearDB() {
 		teamMemberRepository.deleteAll();
 		teamRepository.deleteAll();
+		currentTeam = null;
+		lastException = null;
+		searchResults = null;
 	}
 
 	@Given("I create a team named {string} from {string}")
@@ -94,8 +97,8 @@ public class TeamSteps {
 		IntStream.range(0, count).forEach(i -> {
 			TeamMember m = new TeamMember();
 			m.setName("Member " + i);
-			m.setRole("Student"); // El rol és obligatori
-			m.setBirthDate(java.time.LocalDate.of(2010, 1, 1)); // La data és obligatòria
+			m.setRole("Student");
+			m.setBirthDate(java.time.LocalDate.of(2010, 1, 1));
 			currentTeam.addMember(m);
 		});
 		teamRepository.save(currentTeam);
@@ -108,8 +111,8 @@ public class TeamSteps {
 			Team loadedTeam = teamRepository.findById(currentTeam.getName()).orElseThrow();
 			TeamMember extra = new TeamMember();
 			extra.setName("Extra Member");
-			extra.setRole("Substitute"); // Afegit
-			extra.setBirthDate(java.time.LocalDate.of(2012, 5, 5)); // Afegit
+			extra.setRole("Substitute");
+			extra.setBirthDate(java.time.LocalDate.of(2012, 5, 5));
 
 			loadedTeam.addMember(extra);
 			teamRepository.save(loadedTeam);
@@ -170,15 +173,5 @@ public class TeamSteps {
 	@Then("I should find {int} team in the list")
 	public void verifySearchResults(int count) {
 		assertEquals(count, searchResults.size());
-	}
-
-	@Given("the system is empty")
-	public void clearDB() {
-		teamMemberRepository.deleteAll();
-		teamRepository.deleteAll();
-		// Reseteamos variables de estado para evitar falsos positivos
-		currentTeam = null;
-		lastException = null;
-		searchResults = null;
 	}
 }
