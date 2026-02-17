@@ -12,6 +12,7 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -48,8 +49,9 @@ public class Team extends UriEntity<String> {
 	@Column(name = "city", length = 100)
 	private String city;
 
+	@NotNull(message = "Foundation year is mandatory")
 	@Min(value = 1998, message = "Foundation year must be 1998 or later")
-	private int foundationYear;
+	private Integer foundationYear;
 
 	@Size(max = 100, message = "Educational center name too long")
 	private String educationalCenter;

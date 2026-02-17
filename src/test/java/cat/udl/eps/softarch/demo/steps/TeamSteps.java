@@ -126,11 +126,18 @@ public class TeamSteps {
 
 	@Then("I should receive an error {string}")
 	public void verifyErrorMessage(String expectedMessage) {
-		assertNotNull(lastException);
-		assertTrue(lastException.getMessage().contains(expectedMessage)
-				|| (lastException.getCause() != null
-						&& lastException.getCause().getMessage().contains(expectedMessage)),
-				"Unexpected error message: " + lastException.getMessage());
+		assertNotNull(lastException, "No exception was captured");
+		boolean found = false;
+		Throwable current = lastException;
+		while (current != null) {
+			if (current.getMessage() != null && current.getMessage().contains(expectedMessage)) {
+				found = true;
+				break;
+			}
+			current = current.getCause();
+		}
+		assertTrue(found, "Error message '" + expectedMessage + "' not found in exception chain. Got: "
+				+ lastException.getMessage());
 	}
 
 	@Given("I have a team {string} with a member {string}")
@@ -151,7 +158,7 @@ public class TeamSteps {
 	}
 
 	@Then("no members should exist in the system")
-	public void noMembers() {
+	public void verifyNoMembersExist() {
 		assertEquals(0, teamMemberRepository.count());
 	}
 
