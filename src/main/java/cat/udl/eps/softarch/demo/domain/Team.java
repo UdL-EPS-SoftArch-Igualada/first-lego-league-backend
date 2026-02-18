@@ -2,11 +2,16 @@ package cat.udl.eps.softarch.demo.domain;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
@@ -67,6 +72,16 @@ public class Team extends UriEntity<String> {
 	@ToString.Exclude
 	private List<TeamMember> members = new ArrayList<>();
 
+	@ManyToMany
+	@JoinTable(
+		name = "team_floaters",
+		joinColumns = @JoinColumn(name = "team_name"),
+		inverseJoinColumns = @JoinColumn(name = "floater_id")
+	)
+	@Size(max = 2, message = "A team cannot have more than 2 floaters")
+	@ToString.Exclude
+	private Set<Floater> floaters = new HashSet<>();
+
 	public Team(String name) {
 		this.name = name;
 	}
@@ -84,5 +99,18 @@ public class Team extends UriEntity<String> {
 		}
 		members.add(member);
 		member.setTeam(this);
+	}
+
+	public void addFloater(Floater floater) {
+		if (floaters.size() >= 2) {
+			throw new IllegalStateException("A team cannot have more than 2 floaters");
+		}
+		floaters.add(floater);
+		floater.getAssistedTeams().add(this);
+	}
+
+	public void removeFloater(Floater floater) {
+		floaters.remove(floater);
+		floater.getAssistedTeams().remove(this);
 	}
 }
