@@ -57,7 +57,7 @@ public class ManageScientificProjectStepDefs {
 				.with(AuthenticationStepDefs.authenticate()));
 	}
 
-	@Then("The response contains {int} scientific project(s)")
+	@Then("The response contains {int} scientific project\\(s)")
 	public void theResponseContainsNProjects(Integer count) throws Exception {
 		stepDefs.result.andExpect(
 			jsonPath("$._embedded.scientificProjects", hasSize(count)));
