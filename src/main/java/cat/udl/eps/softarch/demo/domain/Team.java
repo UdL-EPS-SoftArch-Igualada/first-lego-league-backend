@@ -15,6 +15,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
+import jakarta.persistence.ManyToMany; // relation from coach
+import jakarta.persistence.JoinTable; // relation from coach
+import jakarta.persistence.JoinColumn; // relation from coach
+import java.util.HashSet; // relation from coach
+import java.util.Set; // relation from coach
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -85,4 +90,18 @@ public class Team extends UriEntity<String> {
 		members.add(member);
 		member.setTeam(this);
 	}
+	
+	@ManyToMany
+	@JoinTable(
+		name = "team_coach",
+		joinColumns = @JoinColumn(name = "team_name"),
+		inverseJoinColumns = @JoinColumn(name = "coach_id")
+	)
+	@ToString.Exclude
+	private Set<Coach> trainedBy = new HashSet<>();
+
+	
 }
+
+
+
