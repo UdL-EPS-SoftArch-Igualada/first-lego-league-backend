@@ -1,4 +1,4 @@
-package cat.udl.eps.softarch.demo;
+package cat.udl.eps.softarch.fll;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -6,8 +6,8 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import cat.udl.eps.softarch.demo.domain.Team;
-import cat.udl.eps.softarch.demo.domain.TeamMember;
+import cat.udl.eps.softarch.fll.domain.Team;
+import cat.udl.eps.softarch.fll.domain.TeamMember;
 
 class TeamMemberTest {
 	private Team team;
