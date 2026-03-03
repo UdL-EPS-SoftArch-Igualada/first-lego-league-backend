@@ -6,33 +6,25 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 @Entity
 @Table(name = "referees")
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class Referee extends Volunteer {
 
+	@EqualsAndHashCode.Include
 	private boolean expert;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "supervises_table_id")
 	@JsonBackReference("table-referees")
 	private CompetitionTable supervisesTable;
-
-
-	public boolean isExpert() {
-		return expert;
-	}
-
-	public void setExpert(boolean expert) {
-		this.expert = expert;
-	}
-
-	public CompetitionTable getSupervisesTable() {
-		return supervisesTable;
-	}
-
-	public void setSupervisesTable(CompetitionTable supervisesTable) {
-		this.supervisesTable = supervisesTable;
-	}
 }
