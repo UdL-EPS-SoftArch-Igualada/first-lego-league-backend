@@ -1,9 +1,10 @@
 package cat.udl.eps.softarch.fll.domain;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class VenueValidationTest {
 
@@ -18,25 +19,28 @@ class VenueValidationTest {
 		@Test
 		void nullNameThrows() {
 			assertThrows(DomainValidationException.class,
-					() -> Venue.create(null, "Lleida"));
+				() -> Venue.create(null, "Lleida"));
 		}
 
 		@Test
 		void blankNameThrows() {
 			assertThrows(DomainValidationException.class,
-					() -> Venue.create("  ", "Lleida"));
+				() -> Venue.create("  ", "Lleida"));
 		}
+	}
 
+	@Nested
+	class EmptyCity {
 		@Test
 		void nullCityThrows() {
 			assertThrows(DomainValidationException.class,
-					() -> Venue.create("Lleida Arena", null));
+				() -> Venue.create("Lleida Arena", null));
 		}
 
 		@Test
 		void blankCityThrows() {
 			assertThrows(DomainValidationException.class,
-					() -> Venue.create("Lleida Arena", ""));
+				() -> Venue.create("Lleida Arena", ""));
 		}
 	}
 }
