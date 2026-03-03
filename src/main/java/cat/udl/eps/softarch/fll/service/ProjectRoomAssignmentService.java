@@ -13,66 +13,66 @@ import org.springframework.transaction.annotation.Isolation;
 
 @Service
 public class ProjectRoomAssignmentService {
-    
-    private final ProjectRoomRepository projectRoomRepository;
-    private final JudgeRepository judgeRepository;
 
-    public ProjectRoomAssignmentService(ProjectRoomRepository projectRoomRepository, JudgeRepository judgeRepository) {
-        this.projectRoomRepository = projectRoomRepository;
-        this.judgeRepository = judgeRepository;
-    }
+	private final ProjectRoomRepository projectRoomRepository;
+	private final JudgeRepository judgeRepository;
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    public AssignJudgeResponse assignJudge(AssignJudgeRequest request) {
-        ProjectRoom room = projectRoomRepository.findById(request.roomId())
-                .orElseThrow(() -> new RoomAssignmentException("ROOM_NOT_FOUND", "Room not found"));
-                
-        Long judgeId;
-        try {
-            judgeId = Long.valueOf(request.judgeId());
-        } catch (NumberFormatException ex) {
-            throw new RoomAssignmentException("JUDGE_NOT_FOUND", "Invalid judge ID format");
-        }
+	public ProjectRoomAssignmentService(ProjectRoomRepository projectRoomRepository, JudgeRepository judgeRepository) {
+		this.projectRoomRepository = projectRoomRepository;
+		this.judgeRepository = judgeRepository;
+	}
 
-        Judge judge = judgeRepository.findById(judgeId)
-                .orElseThrow(() -> new RoomAssignmentException("JUDGE_NOT_FOUND", "Judge not found"));
+	@Transactional(isolation = Isolation.SERIALIZABLE)
+	public AssignJudgeResponse assignJudge(AssignJudgeRequest request) {
+		ProjectRoom room = projectRoomRepository.findById(request.roomId())
+				.orElseThrow(() -> new RoomAssignmentException("ROOM_NOT_FOUND", "Room not found"));
 
-        boolean isAlreadyManager = room.getManagedByJudge() != null 
-                                    && room.getManagedByJudge().getId().equals(judge.getId());
-        
-        boolean isAlreadyPanelist = room.getPanelists().stream()
-                                    .anyMatch(p -> p.getId().equals(judge.getId()));
-        
-        if (isAlreadyManager || isAlreadyPanelist) {
-            throw new RoomAssignmentException("JUDGE_ALREADY_ASSIGNED", "This judge is already assigned to this room");
-        }
+		Long judgeId;
+		try {
+			judgeId = Long.valueOf(request.judgeId());
+		} catch (NumberFormatException ex) {
+			throw new RoomAssignmentException("JUDGE_NOT_FOUND", "Invalid judge ID format");
+		}
 
-        String assignedRole;
+		Judge judge = judgeRepository.findById(judgeId)
+				.orElseThrow(() -> new RoomAssignmentException("JUDGE_NOT_FOUND", "Judge not found"));
 
-        if (request.isManager()) {
-            if (room.getManagedByJudge() != null) {
-                throw new RoomAssignmentException("ROOM_ALREADY_HAS_MANAGER", "This room already has a manager assigned");
-            }
-            room.setManagedByJudge(judge);
-            assignedRole = "MANAGER";
-        } else {
-            if (room.getPanelists().size() >= 3) {
-                throw new RoomAssignmentException("MAX_PANELISTS_REACHED", "This room has reached the maximum of 3 panelists");
-            }
-            
-            judge.setMemberOfRoom(room);
-            room.getPanelists().add(judge);
-            assignedRole = "PANELIST";
-        }
+		boolean isAlreadyManager = room.getManagedByJudge() != null
+				&& room.getManagedByJudge().getId().equals(judge.getId());
 
-        projectRoomRepository.save(room);
-        judgeRepository.save(judge);
+		boolean isAlreadyPanelist = room.getPanelists().stream()
+				.anyMatch(p -> p.getId().equals(judge.getId()));
 
-        return new AssignJudgeResponse(
-            request.roomId(),
-            request.judgeId(),
-            assignedRole,
-            "ASSIGNED"
-        );
-    }
+		if (isAlreadyManager || isAlreadyPanelist) {
+			throw new RoomAssignmentException("JUDGE_ALREADY_ASSIGNED", "This judge is already assigned to this room");
+		}
+
+		String assignedRole;
+
+		if (request.isManager()) {
+			if (room.getManagedByJudge() != null) {
+				throw new RoomAssignmentException("ROOM_ALREADY_HAS_MANAGER", "This room already has a manager assigned");
+			}
+			room.setManagedByJudge(judge);
+			assignedRole = "MANAGER";
+		} else {
+			if (room.getPanelists().size() >= 3) {
+				throw new RoomAssignmentException("MAX_PANELISTS_REACHED", "This room has reached the maximum of 3 panelists");
+			}
+
+			judge.setMemberOfRoom(room);
+			room.getPanelists().add(judge);
+			assignedRole = "PANELIST";
+		}
+
+		projectRoomRepository.save(room);
+		judgeRepository.save(judge);
+
+		return new AssignJudgeResponse(
+			request.roomId(),
+			request.judgeId(),
+			assignedRole,
+			"ASSIGNED"
+		);
+	}
 }
