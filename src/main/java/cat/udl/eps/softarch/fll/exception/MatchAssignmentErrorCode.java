@@ -1,6 +1,7 @@
 package cat.udl.eps.softarch.fll.exception;
 
 public enum MatchAssignmentErrorCode {
+	ROUND_NOT_FOUND,
 	MATCH_NOT_FOUND,
 	REFEREE_NOT_FOUND,
 	INVALID_ROLE,
