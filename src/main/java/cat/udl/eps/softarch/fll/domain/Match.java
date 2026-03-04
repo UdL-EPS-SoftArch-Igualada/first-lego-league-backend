@@ -2,6 +2,7 @@ package cat.udl.eps.softarch.fll.domain;
 
 import java.time.LocalTime;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -34,6 +35,16 @@ public class Match extends UriEntity<Long> {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "table_id")
 	private CompetitionTable competitionTable;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "team_a_id")
+	@JsonIdentityReference(alwaysAsId = true)
+	private Team teamA;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "team_b_id")
+	@JsonIdentityReference(alwaysAsId = true)
+	private Team teamB;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "referee_id")
@@ -83,6 +94,22 @@ public class Match extends UriEntity<Long> {
 
 	public void setCompetitionTable(CompetitionTable competitionTable) {
 		this.competitionTable = competitionTable;
+	}
+
+	public Team getTeamA() {
+		return teamA;
+	}
+
+	public void setTeamA(Team teamA) {
+		this.teamA = teamA;
+	}
+
+	public Team getTeamB() {
+		return teamB;
+	}
+
+	public void setTeamB(Team teamB) {
+		this.teamB = teamB;
 	}
 
 	public Referee getReferee() {

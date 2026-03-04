@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import cat.udl.eps.softarch.fll.controller.dto.BatchMatchAssignmentRequest;
+import cat.udl.eps.softarch.fll.controller.dto.BatchMatchAssignmentResponse;
 import cat.udl.eps.softarch.fll.controller.dto.MatchAssignmentRequest;
 import cat.udl.eps.softarch.fll.controller.dto.MatchAssignmentResponse;
 import cat.udl.eps.softarch.fll.domain.Match;
@@ -28,6 +30,13 @@ public class MatchAssignmentController {
 				String.valueOf(assignedMatch.getId()),
 				String.valueOf(assignedMatch.getReferee().getId()),
 				"ASSIGNED");
+		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+
+	@PostMapping("/batch")
+	public ResponseEntity<BatchMatchAssignmentResponse> assignRefereesBatch(
+			@Valid @RequestBody BatchMatchAssignmentRequest request) {
+		BatchMatchAssignmentResponse response = matchAssignmentService.assignBatch(request.roundId(), request.assignments());
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 }

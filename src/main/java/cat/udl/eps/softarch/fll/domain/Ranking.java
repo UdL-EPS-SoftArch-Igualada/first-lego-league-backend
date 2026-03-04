@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -13,38 +14,32 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * This entity links a team to a match and records the score obtained.
- */
 @Entity
-@Table(name = "match_result", uniqueConstraints = @UniqueConstraint(columnNames = { "match_id", "team_name" }))
+@Table(name = "rankings", uniqueConstraints = @UniqueConstraint(columnNames = "team_name"))
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class MatchResult extends UriEntity<Long> {
+public class Ranking extends UriEntity<Long> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	/**
-	 * The score obtained by the team in this match. Must be a non-negative integer.
-	 */
-	@NotNull(message = "Score is mandatory")
-	@Min(value = 0, message = "Score cannot be negative")
-	private Integer score;
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "team_name", referencedColumnName = "name", nullable = false, unique = true)
+	@JsonIdentityReference(alwaysAsId = true)
+	private Team team;
+
+	@NotNull
+	@Min(value = 0, message = "Total score cannot be negative")
+	private Integer totalScore;
+
+	@NotNull
+	@Min(value = 1, message = "Ranking position must be at least 1")
+	private Integer position;
 
 	@Override
 	public Long getId() {
-		return this.id;
+		return id;
 	}
-
-	@NotNull
-	@ManyToOne
-	@JsonIdentityReference(alwaysAsId = true)
-	private Match match;
-
-	@NotNull
-	@ManyToOne
-	@JsonIdentityReference(alwaysAsId = true)
-	private Team team;
 }
