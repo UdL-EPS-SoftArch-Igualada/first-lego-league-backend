@@ -1,72 +1,68 @@
-package cat.udl.eps.softarch.fll.steps;
+package cat.udl.eps.softarch.fll.service;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import java.nio.charset.StandardCharsets;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
+import java.time.LocalTime;
+import java.util.List;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import cat.udl.eps.softarch.fll.domain.Match;
+import cat.udl.eps.softarch.fll.exception.MatchScheduleErrorCode;
+import cat.udl.eps.softarch.fll.exception.MatchScheduleException;
+import cat.udl.eps.softarch.fll.repository.MatchRepository;
 
-public class ManageFloaterStepDefs {
+@Service
+public class MatchScheduleValidationService {
 
-    private final StepDefs stepDefs;
-    private String currentFloaterUrl;
+	private final MatchRepository matchRepository;
 
-    public ManageFloaterStepDefs(StepDefs stepDefs) {
-        this.stepDefs = stepDefs;
-    }
+	public MatchScheduleValidationService(MatchRepository matchRepository) {
+		this.matchRepository = matchRepository;
+	}
 
-    @When("I request to create a floater with name {string} and student code {string}")
-    public void i_request_to_create_a_floater(String name, String studentCode) throws Exception {
-        String payload = String.format(
-            "{\"name\": \"%s\", \"studentCode\": \"%s\", \"emailAddress\": \"test@fll.com\", \"phoneNumber\": \"123456789\"}",
-            name, studentCode
-        );
+	@Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
+	public void validateForCreateOrUpdate(Match match) {
+		validateTimeRange(match.getStartTime(), match.getEndTime());
 
-        stepDefs.result = stepDefs.mockMvc.perform(post("/floaters")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(payload)
-                .characterEncoding(StandardCharsets.UTF_8)
-                .with(user("admin").roles("ADMIN")));
-        
-        if (stepDefs.result.andReturn().getResponse().getStatus() == 201) {
-            currentFloaterUrl = stepDefs.result.andReturn().getResponse().getHeader("Location");
-        }
-    }
+		if (match.getCompetitionTable() != null) {
+			validateNoTableOverlap(
+					match.getCompetitionTable().getId(),
+					match.getStartTime(),
+					match.getEndTime(),
+					match.getId()
+			);
+		}
+	}
 
-    @Given("a floater exists with name {string} and student code {string}")
-    public void a_floater_exists(String name, String studentCode) throws Exception {
-        i_request_to_create_a_floater(name, studentCode);
-    }
+	public void validateTimeRange(LocalTime startTime, LocalTime endTime) {
+		if (startTime == null || endTime == null) {
+			throw new MatchScheduleException(
+					MatchScheduleErrorCode.INVALID_TIME_RANGE,
+					"Match start and end times cannot be null"
+			);
+		}
 
-    @When("I request to retrieve that floater")
-    public void i_request_to_retrieve_that_floater() throws Exception {
-        stepDefs.result = stepDefs.mockMvc.perform(get(currentFloaterUrl)
-                .with(user("admin").roles("ADMIN")));
-    }
+		if (!startTime.isBefore(endTime)) {
+			throw new MatchScheduleException(
+					MatchScheduleErrorCode.INVALID_TIME_RANGE,
+					"Match start time must be strictly before end time"
+			);
+		}
+	}
 
-    @When("I request to update the floater name to {string}")
-    public void i_request_to_update_the_floater_name(String newName) throws Exception {
-        String payload = String.format("{\"name\": \"%s\"}", newName);
-        
-        stepDefs.result = stepDefs.mockMvc.perform(patch(currentFloaterUrl)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(payload)
-                .characterEncoding(StandardCharsets.UTF_8)
-                .with(user("admin").roles("ADMIN")));
-    }
+	public void validateNoTableOverlap(String tableId, LocalTime newStartTime, LocalTime newEndTime, Long currentMatchId) {
+		List<Match> overlaps = matchRepository.findOverlappingMatchesByTable(
+				tableId,
+				newStartTime,
+				newEndTime,
+				currentMatchId
+		);
 
-    @When("I request to delete that floater")
-    public void i_request_to_delete_that_floater() throws Exception {
-        stepDefs.result = stepDefs.mockMvc.perform(delete(currentFloaterUrl)
-                .with(user("admin").roles("ADMIN")));
-    }
-
-    @Then("the floater API response status should be {int}")
-    public void the_floater_api_response_status_should_be(int expectedStatus) throws Exception {
-        stepDefs.result.andExpect(status().is(expectedStatus));
-    }
+		if (!overlaps.isEmpty()) {
+			throw new MatchScheduleException(
+					MatchScheduleErrorCode.TABLE_TIME_OVERLAP,
+					"The match schedule overlaps with an existing match on the same table"
+			);
+		}
+	}
 }
