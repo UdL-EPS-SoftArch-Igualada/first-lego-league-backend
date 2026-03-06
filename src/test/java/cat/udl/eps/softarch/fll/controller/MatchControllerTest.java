@@ -77,6 +77,8 @@ class MatchControllerTest {
 		mockMvc.perform(post("/matches/15/assign-table")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"tableIdentifier\":\"\"}"))
-				.andExpect(status().isUnprocessableEntity());
+				.andExpect(status().isUnprocessableEntity())
+				.andExpect(jsonPath("$.error").value("VALIDATION_ERROR"))
+				.andExpect(jsonPath("$.message").isNotEmpty());
 	}
 }

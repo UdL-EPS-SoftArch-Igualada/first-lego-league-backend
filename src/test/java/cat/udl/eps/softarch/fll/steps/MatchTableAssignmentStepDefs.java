@@ -69,6 +69,9 @@ public class MatchTableAssignmentStepDefs {
 
 	@When("I assign that match to table identifier {string}")
 	public void assignCurrentMatchToTable(String tableIdentifier) throws Exception {
+		if (currentMatch == null) {
+			throw new IllegalStateException("No current match set. Ensure a match creation step runs first.");
+		}
 		assignMatchToTable(currentMatch.getId(), tableIdentifier);
 	}
 

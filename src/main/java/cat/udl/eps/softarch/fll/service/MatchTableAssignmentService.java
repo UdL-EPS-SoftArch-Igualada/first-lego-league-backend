@@ -48,8 +48,14 @@ public class MatchTableAssignmentService {
 	}
 
 	private void validateMatchSchedule(Match match) {
-		if (match.getStartTime() == null || match.getEndTime() == null || !match.getEndTime().isAfter(match.getStartTime())) {
-			throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Match has invalid schedule");
+		if (match.getStartTime() == null) {
+			throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Match is missing start time");
+		}
+		if (match.getEndTime() == null) {
+			throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Match is missing end time");
+		}
+		if (!match.getEndTime().isAfter(match.getStartTime())) {
+			throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Match end time must be after start time");
 		}
 	}
 

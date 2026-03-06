@@ -39,6 +39,7 @@ public interface MatchRepository extends CrudRepository<Match, Long>, PagingAndS
 			AND m.endTime > :newMatchStartTime
 			AND (:currentMatchId IS NULL OR m.id <> :currentMatchId)
 			""")
+	@RestResource(exported = false)
 	List<Match> findOverlappingAssignmentsForTable(
 			@Param("table") CompetitionTable table,
 			@Param("newMatchStartTime") LocalTime newMatchStartTime,
