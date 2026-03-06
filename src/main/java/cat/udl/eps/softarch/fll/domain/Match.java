@@ -13,28 +13,33 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "matches")
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 public class Match extends UriEntity<Long> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@EqualsAndHashCode.Include
 	private Long id;
 
 	private LocalTime startTime;
-
 	private LocalTime endTime;
 
-	@JsonBackReference("round-matches")
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "round_id")
-	private Round round;
+	@Enumerated(EnumType.STRING)
+	private MatchState state = MatchState.SCHEDULED;
 
-	@JsonBackReference("table-matches")
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "table_id")
-	private CompetitionTable competitionTable;
+	@JoinColumn(name = "referee_id")
+	private Referee referee;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "team_a_id")
@@ -47,84 +52,12 @@ public class Match extends UriEntity<Long> {
 	private Team teamB;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "referee_id")
-	private Referee referee;
+	@JoinColumn(name = "round_id")
+	@JsonBackReference("round-matches")
+	private Round round;
 
-	@Enumerated(EnumType.STRING)
-	private MatchState state = MatchState.SCHEDULED;
-
-	public Match() {}
-
-	@Override
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public LocalTime getStartTime() {
-		return startTime;
-	}
-
-	public void setStartTime(LocalTime startTime) {
-		this.startTime = startTime;
-	}
-
-	public LocalTime getEndTime() {
-		return endTime;
-	}
-
-	public void setEndTime(LocalTime endTime) {
-		this.endTime = endTime;
-	}
-
-	public Round getRound() {
-		return round;
-	}
-
-	public void setRound(Round round) {
-		this.round = round;
-	}
-
-	public CompetitionTable getCompetitionTable() {
-		return competitionTable;
-	}
-
-	public void setCompetitionTable(CompetitionTable competitionTable) {
-		this.competitionTable = competitionTable;
-	}
-
-	public Team getTeamA() {
-		return teamA;
-	}
-
-	public void setTeamA(Team teamA) {
-		this.teamA = teamA;
-	}
-
-	public Team getTeamB() {
-		return teamB;
-	}
-
-	public void setTeamB(Team teamB) {
-		this.teamB = teamB;
-	}
-
-	public Referee getReferee() {
-		return referee;
-	}
-
-	public void setReferee(Referee referee) {
-		this.referee = referee;
-	}
-
-	public MatchState getState() {
-		return state;
-	}
-
-	public void setState(MatchState state) {
-		this.state = state;
-	}
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "table_id")
+	@JsonBackReference("table-matches")
+	private CompetitionTable competitionTable;
 }
