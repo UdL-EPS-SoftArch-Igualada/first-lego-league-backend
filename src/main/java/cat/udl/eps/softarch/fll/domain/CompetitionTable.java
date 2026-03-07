@@ -1,7 +1,5 @@
 package cat.udl.eps.softarch.fll.domain;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -9,6 +7,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "competition_tables")
@@ -16,16 +16,20 @@ public class CompetitionTable extends UriEntity<String> {
 
 	@Id
 	private String id;
-
 	@OneToMany(mappedBy = "competitionTable", cascade = CascadeType.ALL)
 	@JsonManagedReference("table-matches")
 	private List<Match> matches = new ArrayList<>();
-
 	@OneToMany(mappedBy = "supervisesTable")
 	@Size(max = 3, message = "A table can have a maximum of 3 referees")
 	@JsonManagedReference("table-referees")
 	private List<Referee> referees = new ArrayList<>();
 
+	public static CompetitionTable create(String id) {
+		DomainValidation.requireNonBlank(id, "id");
+		CompetitionTable table = new CompetitionTable();
+		table.id = id;
+		return table;
+	}
 
 	@Override
 	public String getId() {

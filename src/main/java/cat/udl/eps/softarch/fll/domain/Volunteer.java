@@ -21,10 +21,10 @@ import lombok.Setter;
 @Table(name = "volunteers")
 @Inheritance(strategy = InheritanceType.JOINED)
 @Getter
-@Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public abstract class Volunteer extends UriEntity<Long> {
 
+	@Setter
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@EqualsAndHashCode.Include
@@ -40,9 +40,31 @@ public abstract class Volunteer extends UriEntity<Long> {
 
 	@NotBlank(message = "Phone number is mandatory")
 	private String phoneNumber;
-
+	@Setter
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "edition_id")
 	private Edition edition;
+
+	protected Volunteer() {
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		DomainValidation.requireNonBlank(phoneNumber, "phoneNumber");
+		this.phoneNumber = phoneNumber;
+	}
+
+	protected void validateFields(String name, String emailAddress, String phoneNumber) {
+		DomainValidation.requireNonBlank(name, "name");
+		DomainValidation.requireValidEmail(emailAddress, "emailAddress");
+		DomainValidation.requireNonBlank(phoneNumber, "phoneNumber");
+	}
+
+	protected void initFields(String name, String emailAddress, String phoneNumber) {
+		validateFields(name, emailAddress, phoneNumber);
+
+		this.name = name;
+		this.emailAddress = emailAddress;
+		this.phoneNumber = phoneNumber;
+	}
 }
 

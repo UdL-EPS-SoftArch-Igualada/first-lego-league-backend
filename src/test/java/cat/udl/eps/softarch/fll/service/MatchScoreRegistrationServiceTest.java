@@ -1,15 +1,10 @@
 package cat.udl.eps.softarch.fll.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.Optional;
+import cat.udl.eps.softarch.fll.domain.Match;
+import cat.udl.eps.softarch.fll.domain.MatchResult;
+import cat.udl.eps.softarch.fll.domain.Team;
+import cat.udl.eps.softarch.fll.repository.MatchRepository;
+import cat.udl.eps.softarch.fll.repository.MatchResultRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,11 +14,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
-import cat.udl.eps.softarch.fll.domain.Match;
-import cat.udl.eps.softarch.fll.domain.MatchResult;
-import cat.udl.eps.softarch.fll.domain.Team;
-import cat.udl.eps.softarch.fll.repository.MatchRepository;
-import cat.udl.eps.softarch.fll.repository.MatchResultRepository;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MatchScoreRegistrationServiceTest {
@@ -52,8 +52,8 @@ class MatchScoreRegistrationServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		Team teamA = new Team("Team-A");
-		Team teamB = new Team("Team-B");
+		Team teamA = Team.create("Team-A", "City-A", 2000, "Junior");
+		Team teamB = Team.create("Team-B", "City-A", 2000, "Junior");
 
 		match = new Match();
 		match.setId(1L);
@@ -92,8 +92,8 @@ class MatchScoreRegistrationServiceTest {
 		when(matchRepository.findById(1L)).thenReturn(Optional.empty());
 
 		MatchScoreRegistrationService.RegistrationException ex = assertThrows(
-				MatchScoreRegistrationService.RegistrationException.class,
-				() -> matchScoreRegistrationService.registerMatchScore(matchId, teamAId, teamBId, teamAScore, teamBScore));
+			MatchScoreRegistrationService.RegistrationException.class,
+			() -> matchScoreRegistrationService.registerMatchScore(matchId, teamAId, teamBId, teamAScore, teamBScore));
 
 		assertEquals(MatchScoreRegistrationService.ErrorCode.MATCH_NOT_FOUND, ex.getErrorCode());
 		verify(matchResultRepository, never()).saveAllAndFlush(any());
@@ -106,8 +106,8 @@ class MatchScoreRegistrationServiceTest {
 		when(matchRepository.findById(1L)).thenReturn(Optional.of(match));
 
 		MatchScoreRegistrationService.RegistrationException ex = assertThrows(
-				MatchScoreRegistrationService.RegistrationException.class,
-				() -> matchScoreRegistrationService.registerMatchScore(matchId, teamAId, teamBId, teamAScore, teamBScore));
+			MatchScoreRegistrationService.RegistrationException.class,
+			() -> matchScoreRegistrationService.registerMatchScore(matchId, teamAId, teamBId, teamAScore, teamBScore));
 
 		assertEquals(MatchScoreRegistrationService.ErrorCode.INVALID_MATCH_STATE, ex.getErrorCode());
 		verify(matchResultRepository, never()).saveAllAndFlush(any());
@@ -120,8 +120,8 @@ class MatchScoreRegistrationServiceTest {
 		when(matchRepository.findById(1L)).thenReturn(Optional.of(match));
 
 		MatchScoreRegistrationService.RegistrationException ex = assertThrows(
-				MatchScoreRegistrationService.RegistrationException.class,
-				() -> matchScoreRegistrationService.registerMatchScore(matchId, teamAId, teamBId, teamAScore, teamBScore));
+			MatchScoreRegistrationService.RegistrationException.class,
+			() -> matchScoreRegistrationService.registerMatchScore(matchId, teamAId, teamBId, teamAScore, teamBScore));
 
 		assertEquals(MatchScoreRegistrationService.ErrorCode.MATCH_NOT_FINISHED, ex.getErrorCode());
 		verify(matchResultRepository, never()).saveAllAndFlush(any());
@@ -134,8 +134,8 @@ class MatchScoreRegistrationServiceTest {
 		when(matchResultRepository.existsByMatch(match)).thenReturn(true);
 
 		MatchScoreRegistrationService.RegistrationException ex = assertThrows(
-				MatchScoreRegistrationService.RegistrationException.class,
-				() -> matchScoreRegistrationService.registerMatchScore(matchId, teamAId, teamBId, teamAScore, teamBScore));
+			MatchScoreRegistrationService.RegistrationException.class,
+			() -> matchScoreRegistrationService.registerMatchScore(matchId, teamAId, teamBId, teamAScore, teamBScore));
 
 		assertEquals(MatchScoreRegistrationService.ErrorCode.RESULT_ALREADY_EXISTS, ex.getErrorCode());
 		verify(matchResultRepository, never()).saveAllAndFlush(any());
@@ -149,8 +149,8 @@ class MatchScoreRegistrationServiceTest {
 		when(matchResultRepository.saveAllAndFlush(any())).thenThrow(new DataIntegrityViolationException("duplicate"));
 
 		MatchScoreRegistrationService.RegistrationException ex = assertThrows(
-				MatchScoreRegistrationService.RegistrationException.class,
-				() -> matchScoreRegistrationService.registerMatchScore(matchId, teamAId, teamBId, teamAScore, teamBScore));
+			MatchScoreRegistrationService.RegistrationException.class,
+			() -> matchScoreRegistrationService.registerMatchScore(matchId, teamAId, teamBId, teamAScore, teamBScore));
 
 		assertEquals(MatchScoreRegistrationService.ErrorCode.RESULT_ALREADY_EXISTS, ex.getErrorCode());
 		verify(rankingService, never()).recalculateRanking();
@@ -163,8 +163,8 @@ class MatchScoreRegistrationServiceTest {
 		when(matchResultRepository.existsByMatch(match)).thenReturn(false);
 
 		MatchScoreRegistrationService.RegistrationException ex = assertThrows(
-				MatchScoreRegistrationService.RegistrationException.class,
-				() -> matchScoreRegistrationService.registerMatchScore(matchId, teamAId, teamBId, teamAScore, teamBScore));
+			MatchScoreRegistrationService.RegistrationException.class,
+			() -> matchScoreRegistrationService.registerMatchScore(matchId, teamAId, teamBId, teamAScore, teamBScore));
 
 		assertEquals(MatchScoreRegistrationService.ErrorCode.INVALID_SCORE, ex.getErrorCode());
 		verify(matchResultRepository, never()).saveAllAndFlush(any());
@@ -176,8 +176,8 @@ class MatchScoreRegistrationServiceTest {
 		teamBScore = null;
 
 		MatchScoreRegistrationService.RegistrationException ex = assertThrows(
-				MatchScoreRegistrationService.RegistrationException.class,
-				() -> matchScoreRegistrationService.registerMatchScore(matchId, teamAId, teamBId, teamAScore, teamBScore));
+			MatchScoreRegistrationService.RegistrationException.class,
+			() -> matchScoreRegistrationService.registerMatchScore(matchId, teamAId, teamBId, teamAScore, teamBScore));
 
 		assertEquals(MatchScoreRegistrationService.ErrorCode.INVALID_SCORE, ex.getErrorCode());
 		verify(matchResultRepository, never()).saveAllAndFlush(any());
@@ -191,8 +191,8 @@ class MatchScoreRegistrationServiceTest {
 		when(matchResultRepository.existsByMatch(match)).thenReturn(false);
 
 		MatchScoreRegistrationService.RegistrationException ex = assertThrows(
-				MatchScoreRegistrationService.RegistrationException.class,
-				() -> matchScoreRegistrationService.registerMatchScore(matchId, teamAId, teamBId, teamAScore, teamBScore));
+			MatchScoreRegistrationService.RegistrationException.class,
+			() -> matchScoreRegistrationService.registerMatchScore(matchId, teamAId, teamBId, teamAScore, teamBScore));
 
 		assertEquals(MatchScoreRegistrationService.ErrorCode.TEAM_MISMATCH, ex.getErrorCode());
 		verify(matchResultRepository, never()).saveAllAndFlush(any());
@@ -215,6 +215,6 @@ class MatchScoreRegistrationServiceTest {
 
 		assertEquals(80, savedResults.get(0).getScore());
 		assertEquals(40, savedResults.get(1).getScore());
-		assertFalse(savedResults.get(0).getTeam().getId().equals(savedResults.get(1).getTeam().getId()));
+		assertNotEquals(savedResults.get(0).getTeam().getId(), savedResults.get(1).getTeam().getId());
 	}
 }

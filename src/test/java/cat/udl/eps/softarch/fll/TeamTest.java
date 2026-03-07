@@ -1,34 +1,32 @@
 package cat.udl.eps.softarch.fll;
 
+import cat.udl.eps.softarch.fll.domain.Team;
+import cat.udl.eps.softarch.fll.domain.TeamMember;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.time.LocalDate;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import cat.udl.eps.softarch.fll.domain.Team;
-import cat.udl.eps.softarch.fll.domain.TeamMember;
 
 class TeamTest {
 	private Team team;
 
 	@BeforeEach
 	void setUp() {
-		team = new Team("UdL Eagles");
-		team.setCity("Igualada");
-		team.setCategory("Senior");
+		team = Team.create("UdL Eagles", "Igualada", 2000, "Senior");
 	}
 
 	@Test
 	@DisplayName("Validate max 10 team members")
 	void testMemberLimit() {
 		for (int i = 0; i < 10; i++) {
-			team.addMember(new TeamMember());
+			TeamMember.create("Member " + i, "role" + i, LocalDate.of(2000, 1, 1), team);
 		}
-		TeamMember extraMember = new TeamMember();
-		assertThrows(IllegalStateException.class, () -> team.addMember(extraMember));
+		LocalDate birthDate = LocalDate.of(2000, 1, 1);
+		assertThrows(IllegalStateException.class, () -> TeamMember.create("ExtraMember", "role" + 10, birthDate, team));
 	}
 
 	@Test

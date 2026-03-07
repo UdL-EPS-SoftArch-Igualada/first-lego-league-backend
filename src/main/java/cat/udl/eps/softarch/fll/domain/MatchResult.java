@@ -26,25 +26,35 @@ public class MatchResult extends UriEntity<Long> {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	/**
-	 * The score obtained by the team in this match. Must be a non-negative integer.
-	 */
 	@NotNull(message = "Score is mandatory")
 	@Min(value = 0, message = "Score cannot be negative")
 	private Integer score;
+	@NotNull
+	@ManyToOne
+	@JsonIdentityReference(alwaysAsId = true)
+	private Match match;
+	@NotNull
+	@ManyToOne
+	@JsonIdentityReference(alwaysAsId = true)
+	private Team team;
+
+	protected MatchResult() {
+	}
+
+	public static MatchResult create(Integer score, Match match, Team team) {
+		DomainValidation.requireNonNegative(score, "score");
+		DomainValidation.requireNonNull(match, "match");
+		DomainValidation.requireNonNull(team, "team");
+
+		MatchResult result = new MatchResult();
+		result.score = score;
+		result.match = match;
+		result.team = team;
+		return result;
+	}
 
 	@Override
 	public Long getId() {
 		return this.id;
 	}
-
-	@NotNull
-	@ManyToOne
-	@JsonIdentityReference(alwaysAsId = true)
-	private Match match;
-
-	@NotNull
-	@ManyToOne
-	@JsonIdentityReference(alwaysAsId = true)
-	private Team team;
 }

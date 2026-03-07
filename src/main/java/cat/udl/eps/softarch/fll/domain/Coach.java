@@ -1,7 +1,5 @@
 package cat.udl.eps.softarch.fll.domain;
 
-import java.util.HashSet;
-import java.util.Set;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,6 +11,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Data
@@ -30,11 +30,21 @@ public class Coach extends UriEntity<Integer> {
 	@NotBlank
 	@Email
 	@Column(unique = true)
-
 	private String emailAddress;
+
 	private String phoneNumber;
 
 	@ManyToMany(mappedBy = "trainedBy")
 	@ToString.Exclude
 	private Set<Team> teams = new HashSet<>();
+
+	public static Coach create(String name, String emailAddress) {
+		DomainValidation.requireNonBlank(name, "name");
+		DomainValidation.requireValidEmail(emailAddress, "emailAddress");
+
+		Coach coach = new Coach();
+		coach.name = name;
+		coach.emailAddress = emailAddress;
+		return coach;
+	}
 }

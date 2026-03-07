@@ -1,11 +1,6 @@
 package cat.udl.eps.softarch.fll.steps;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.util.List;
-import java.util.Optional;
-import org.springframework.transaction.annotation.Transactional;
+import cat.udl.eps.softarch.fll.domain.DomainValidationException;
 import cat.udl.eps.softarch.fll.domain.Floater;
 import cat.udl.eps.softarch.fll.domain.Team;
 import cat.udl.eps.softarch.fll.repository.FloaterRepository;
@@ -14,6 +9,12 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class VolunteerStepDefs {
 
@@ -43,11 +44,7 @@ public class VolunteerStepDefs {
 
 	@When("I create a floater with name {string}, email {string}, phone {string} and student code {string}")
 	public void createFloater(String name, String email, String phone, String studentCode) {
-		currentFloater = new Floater();
-		currentFloater.setName(name);
-		currentFloater.setEmailAddress(email);
-		currentFloater.setPhoneNumber(phone);
-		currentFloater.setStudentCode(studentCode);
+		currentFloater = Floater.create(name, email, phone, studentCode);
 	}
 
 	@When("I save the floater")
@@ -85,11 +82,7 @@ public class VolunteerStepDefs {
 	@When("I try to create a floater with name {string} and email {string} and phone {string} and student code {string}")
 	public void tryCreateInvalidFloater(String name, String email, String phone, String studentCode) {
 		try {
-			Floater floater = new Floater();
-			floater.setName(name);
-			floater.setEmailAddress(email);
-			floater.setPhoneNumber(phone);
-			floater.setStudentCode(studentCode);
+			Floater floater = Floater.create(name, email, phone, studentCode);
 			floaterRepository.save(floater);
 		} catch (Exception e) {
 			lastException = e;
@@ -100,14 +93,15 @@ public class VolunteerStepDefs {
 	public void floaterCreationShouldFail() {
 		assertNotNull(lastException);
 		assertTrue(isValidationOrConstraintException(lastException),
-				"Expected a validation or constraint exception but got: " + lastException.getClass().getName());
+			"Expected a validation or constraint exception but got: " + lastException.getClass().getName());
 	}
 
 	private boolean isValidationOrConstraintException(Throwable ex) {
 		Throwable current = ex;
 		while (current != null) {
 			if (current instanceof ConstraintViolationException
-					|| current instanceof org.springframework.dao.DataIntegrityViolationException) {
+				|| current instanceof org.springframework.dao.DataIntegrityViolationException
+				|| current instanceof DomainValidationException) {
 				return true;
 			}
 			current = current.getCause();
@@ -119,8 +113,8 @@ public class VolunteerStepDefs {
 	public void verifyErrorMessage(String expectedMessage) {
 		assertNotNull(lastException, "No exception was captured");
 		assertTrue(findMessageInExceptionChain(lastException, expectedMessage),
-				"Error message '" + expectedMessage + "' not found in exception chain. Got: "
-						+ lastException.getMessage());
+			"Error message '" + expectedMessage + "' not found in exception chain. Got: "
+				+ lastException.getMessage());
 	}
 
 	private boolean findMessageInExceptionChain(Throwable ex, String expectedMessage) {
@@ -178,10 +172,7 @@ public class VolunteerStepDefs {
 
 	@Given("a team named {string} from city {string} exists for floater assignment")
 	public void createTeamForFloaterAssignment(String name, String city) {
-		currentTeam = new Team(name);
-		currentTeam.setCity(city);
-		currentTeam.setFoundationYear(2020);
-		currentTeam.setCategory("Challenge");
+		currentTeam = Team.create(name, city, 2020, "Challenge");
 		currentTeam = teamRepository.save(currentTeam);
 	}
 

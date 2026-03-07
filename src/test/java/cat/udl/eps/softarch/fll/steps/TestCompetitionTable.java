@@ -1,13 +1,13 @@
 package cat.udl.eps.softarch.fll.steps;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import cat.udl.eps.softarch.fll.domain.CompetitionTable;
 import cat.udl.eps.softarch.fll.domain.Referee;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestCompetitionTable {
 
@@ -23,15 +23,14 @@ public class TestCompetitionTable {
 
 	@When("I add a referee named {string} to the table")
 	public void i_add_a_referee_named(String name) {
-		referee = new Referee();
-		referee.setName(name);
+		referee = Referee.create(name, "email@email.com", "123456789");
 		table.addReferee(referee);
 	}
 
 	@When("I try to add another referee to the table")
 	public void i_try_to_add_another_referee_to_the_table() {
 		exceptionCaptured = assertThrows(IllegalStateException.class, () -> {
-			table.addReferee(new Referee());
+			table.addReferee(Referee.create("pep", "pep@email.com", "123456780"));
 		});
 	}
 
@@ -49,7 +48,7 @@ public class TestCompetitionTable {
 	@Given("the table already has {int} referees")
 	public void the_table_already_has_referees(Integer count) {
 		for (long i = 0; i < count; i++) {
-			Referee ref = new Referee();
+			Referee ref = Referee.create("name" + i, "email" + i + "@email.com", "123456789");
 			ref.setId(i);
 			table.addReferee(ref);
 		}
@@ -58,7 +57,7 @@ public class TestCompetitionTable {
 	@Then("the validation should prevent adding a 4th referee")
 	public void the_validation_should_prevent_adding_a_4th_referee() {
 		exceptionCaptured = assertThrows(IllegalStateException.class, () -> {
-			Referee newReferee = new Referee();
+			Referee newReferee = Referee.create("refereeName", "referee@email.com", "123456789");
 			newReferee.setId(999L);
 			table.addReferee(newReferee);
 		});

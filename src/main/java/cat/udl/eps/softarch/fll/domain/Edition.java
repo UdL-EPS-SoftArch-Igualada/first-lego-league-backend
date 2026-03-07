@@ -28,4 +28,19 @@ public class Edition extends UriEntity<Long> {
 
 	@NotBlank
 	private String description;
+
+	protected Edition() {
+	}
+
+	public static Edition create(Integer year, String venueName, String description) {
+		DomainValidation.requireNonNull(year, "year");
+		DomainValidation.requireNonBlank(venueName, "venueName");
+		DomainValidation.requireNonBlank(description, "description");
+
+		Edition edition = new Edition();
+		edition.year = year;
+		edition.venueName = venueName;
+		edition.description = description;
+		return edition;
+	}
 }

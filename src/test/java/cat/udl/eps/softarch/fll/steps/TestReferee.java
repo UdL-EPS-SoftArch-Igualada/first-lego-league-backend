@@ -1,13 +1,13 @@
 package cat.udl.eps.softarch.fll.steps;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import cat.udl.eps.softarch.fll.domain.CompetitionTable;
 import cat.udl.eps.softarch.fll.domain.Referee;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestReferee {
 
@@ -17,7 +17,7 @@ public class TestReferee {
 	@Given("a new referee")
 	public void a_new_referee() {
 		// Usamos el constructor Referee() que está en tu clase
-		this.referee = new Referee();
+		this.referee = Referee.create("John Doe", "john@gmail.com", "123456789");
 	}
 
 	@Given("a competition table exists with ID {string}")

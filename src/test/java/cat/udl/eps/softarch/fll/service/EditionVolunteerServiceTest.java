@@ -1,17 +1,5 @@
 package cat.udl.eps.softarch.fll.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
-import java.util.List;
-import java.util.NoSuchElementException;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import cat.udl.eps.softarch.fll.controller.dto.EditionVolunteersResponse;
 import cat.udl.eps.softarch.fll.domain.Floater;
 import cat.udl.eps.softarch.fll.domain.Judge;
@@ -20,6 +8,18 @@ import cat.udl.eps.softarch.fll.repository.EditionRepository;
 import cat.udl.eps.softarch.fll.repository.FloaterRepository;
 import cat.udl.eps.softarch.fll.repository.JudgeRepository;
 import cat.udl.eps.softarch.fll.repository.RefereeRepository;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import java.util.List;
+import java.util.NoSuchElementException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class EditionVolunteerServiceTest {
@@ -41,24 +41,14 @@ class EditionVolunteerServiceTest {
 
 	@Test
 	void getVolunteersGroupedByTypeReturnsGroupedAndMappedResponse() {
-		Referee referee = new Referee();
+		Referee referee = Referee.create("Ref One", "ref1@example.com", "111111111");
 		referee.setId(1L);
-		referee.setName("Ref One");
-		referee.setEmailAddress("ref1@example.com");
-		referee.setPhoneNumber("111111111");
 
-		Judge judge = new Judge();
+		Judge judge = Judge.create("Judge One", "judge1@example.com", "222222222");
 		judge.setId(2L);
-		judge.setName("Judge One");
-		judge.setEmailAddress("judge1@example.com");
-		judge.setPhoneNumber("222222222");
 
-		Floater floater = new Floater();
+		Floater floater = Floater.create("Floater One", "floater1@example.com", "333333333", "STU-1");
 		floater.setId(3L);
-		floater.setName("Floater One");
-		floater.setEmailAddress("floater1@example.com");
-		floater.setPhoneNumber("333333333");
-		floater.setStudentCode("STU-1");
 
 		when(editionRepository.existsById(10L)).thenReturn(true);
 		when(refereeRepository.findByEditionId(10L)).thenReturn(List.of(referee));
@@ -108,8 +98,8 @@ class EditionVolunteerServiceTest {
 		when(editionRepository.existsById(99L)).thenReturn(false);
 
 		NoSuchElementException exception = assertThrows(
-				NoSuchElementException.class,
-				() -> editionVolunteerService.getVolunteersGroupedByType(99L));
+			NoSuchElementException.class,
+			() -> editionVolunteerService.getVolunteersGroupedByType(99L));
 
 		assertEquals("EDITION_NOT_FOUND", exception.getMessage());
 		verifyNoInteractions(refereeRepository, judgeRepository, floaterRepository);
