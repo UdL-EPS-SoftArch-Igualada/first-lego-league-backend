@@ -6,13 +6,7 @@ import java.util.regex.Pattern;
 public final class DomainValidation {
 
 	private static final Pattern EMAIL_PATTERN =
-		Pattern.compile(
-			"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*" +
-				"@" +
-				"(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+" +
-				"[a-z]{2,}$",
-			Pattern.CASE_INSENSITIVE
-		);
+		Pattern.compile("^[A-Za-z0-9+_.%-]++@(?:[A-Za-z0-9-]++\\.)+[A-Za-z]{2,}+$");
 
 	private DomainValidation() {
 	}

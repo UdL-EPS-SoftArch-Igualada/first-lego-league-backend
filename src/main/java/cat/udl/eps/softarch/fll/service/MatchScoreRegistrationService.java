@@ -19,9 +19,7 @@ public class MatchScoreRegistrationService {
 	private final MatchResultRepository matchResultRepository;
 	private final RankingService rankingService;
 
-	public MatchScoreRegistrationService(MatchRepository matchRepository,
-										 MatchResultRepository matchResultRepository,
-										 RankingService rankingService) {
+	public MatchScoreRegistrationService(MatchRepository matchRepository, MatchResultRepository matchResultRepository, RankingService rankingService) {
 		this.matchRepository = matchRepository;
 		this.matchResultRepository = matchResultRepository;
 		this.rankingService = rankingService;
