@@ -6,6 +6,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -15,6 +17,7 @@ import lombok.EqualsAndHashCode;
  * This entity links a team to a match and records the score obtained.
  */
 @Entity
+@Table(name = "match_result", uniqueConstraints = @UniqueConstraint(columnNames = { "match_id", "team_name" }))
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class MatchResult extends UriEntity<Long> {

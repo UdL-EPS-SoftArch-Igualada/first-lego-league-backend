@@ -2,11 +2,14 @@ package cat.udl.eps.softarch.fll.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -37,8 +40,8 @@ public abstract class Volunteer extends UriEntity<Long> {
 
 	@NotBlank(message = "Phone number is mandatory")
 	private String phoneNumber;
-
-	protected Volunteer() {
+  
+  protected Volunteer() {
 	}
 
 	protected void validateFields(String name, String emailAddress, String phoneNumber) {
@@ -54,6 +57,9 @@ public abstract class Volunteer extends UriEntity<Long> {
 		this.emailAddress = emailAddress;
 		this.phoneNumber = phoneNumber;
 	}
-}
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "edition_id")
+	private Edition edition;
+}
 

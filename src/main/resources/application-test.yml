@@ -1,0 +1,10 @@
+spring:
+    h2:
+        console:
+            enabled: false
+    jpa:
+        generate-ddl: true
+---
+spring:
+    security:
+        enabled: false

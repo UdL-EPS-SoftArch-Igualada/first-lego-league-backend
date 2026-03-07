@@ -64,4 +64,9 @@ public class StepDefs {
 			result.andExpect(jsonPath("$..message", hasItem(containsString(message))));
 		}
 	}
+
+	@And("^The error code is \"([^\"]*)\"$")
+	public void theErrorCodeIs(String errorCode) throws Throwable {
+		result.andExpect(jsonPath("$.error", is(errorCode)));
+	}
 }

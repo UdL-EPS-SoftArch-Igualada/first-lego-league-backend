@@ -28,7 +28,9 @@ public class WebSecurityConfig {
 		http.authorizeHttpRequests(auth -> auth
 				.requestMatchers(HttpMethod.GET, "/identity").authenticated()
 				.requestMatchers(HttpMethod.GET, "/users").authenticated()
+				.requestMatchers(HttpMethod.GET, "/editions/*/volunteers").authenticated()
 				.requestMatchers(HttpMethod.POST, "/users").anonymous()
+				.requestMatchers(HttpMethod.POST, "/matchResults/register").authenticated()
 				.requestMatchers(HttpMethod.POST, "/users/*").denyAll()
 				.requestMatchers(HttpMethod.POST, "/*/*").authenticated()
 				.requestMatchers(HttpMethod.PUT, "/*/*").authenticated()
@@ -45,7 +47,7 @@ public class WebSecurityConfig {
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
-		corsConfiguration.setAllowedOriginPatterns(Arrays.asList(allowedOrigins));
+		corsConfiguration.setAllowedOrigins(Arrays.asList(allowedOrigins));
 		corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 		corsConfiguration.setAllowedHeaders(List.of("*"));
 		corsConfiguration.setAllowCredentials(true);
