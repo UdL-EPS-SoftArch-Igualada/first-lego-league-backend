@@ -1,14 +1,5 @@
 package cat.udl.eps.softarch.fll.steps;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-import org.springframework.http.MediaType;
 import cat.udl.eps.softarch.fll.domain.Edition;
 import cat.udl.eps.softarch.fll.domain.Match;
 import cat.udl.eps.softarch.fll.domain.MatchResult;
@@ -22,6 +13,15 @@ import cat.udl.eps.softarch.fll.repository.TeamRepository;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
+import org.springframework.http.MediaType;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 public class LeaderboardStepDefs {
 	private static final AtomicInteger ROUND_NUMBER_SEQUENCE = new AtomicInteger(10000);
@@ -32,16 +32,15 @@ public class LeaderboardStepDefs {
 	private final MatchRepository matchRepository;
 	private final MatchResultRepository matchResultRepository;
 	private final TeamRepository teamRepository;
-
-	private Long currentEditionId;
 	private final Map<String, String> teamNameByAlias = new HashMap<>();
+	private Long currentEditionId;
 
 	public LeaderboardStepDefs(StepDefs stepDefs,
-			EditionRepository editionRepository,
-			RoundRepository roundRepository,
-			MatchRepository matchRepository,
-			MatchResultRepository matchResultRepository,
-			TeamRepository teamRepository) {
+							   EditionRepository editionRepository,
+							   RoundRepository roundRepository,
+							   MatchRepository matchRepository,
+							   MatchResultRepository matchResultRepository,
+							   TeamRepository teamRepository) {
 		this.stepDefs = stepDefs;
 		this.editionRepository = editionRepository;
 		this.roundRepository = roundRepository;
@@ -113,17 +112,17 @@ public class LeaderboardStepDefs {
 	@When("I request leaderboard for that edition with page {int} and size {int}")
 	public void iRequestLeaderboardForThatEditionWithPagination(int page, int size) throws Exception {
 		stepDefs.result = stepDefs.mockMvc.perform(get("/leaderboards/editions/" + currentEditionId)
-				.param("page", String.valueOf(page))
-				.param("size", String.valueOf(size))
-				.accept(MediaType.APPLICATION_JSON));
+			.param("page", String.valueOf(page))
+			.param("size", String.valueOf(size))
+			.accept(MediaType.APPLICATION_JSON));
 	}
 
 	@When("I request leaderboard for non-existent edition {long} with page {int} and size {int}")
 	public void iRequestLeaderboardForNonExistentEditionWithPagination(long editionId, int page, int size) throws Exception {
 		stepDefs.result = stepDefs.mockMvc.perform(get("/leaderboards/editions/" + editionId)
-				.param("page", String.valueOf(page))
-				.param("size", String.valueOf(size))
-				.accept(MediaType.APPLICATION_JSON));
+			.param("page", String.valueOf(page))
+			.param("size", String.valueOf(size))
+			.accept(MediaType.APPLICATION_JSON));
 	}
 
 	@When("I request leaderboard for a non-existent edition with page {int} and size {int}")
@@ -157,10 +156,11 @@ public class LeaderboardStepDefs {
 	}
 
 	private Edition createEdition() {
-		Edition edition = new Edition();
-		edition.setYear(2025 + ((UUID.randomUUID().hashCode() & 0x7fffffff) % 1000));
-		edition.setVenueName("Venue-" + UUID.randomUUID().toString().substring(0, 6));
-		edition.setDescription("Leaderboard test edition");
+		Edition edition = Edition.create(
+			2025 + ((UUID.randomUUID().hashCode() & 0x7fffffff) % 1000),
+			"Venue-" + UUID.randomUUID().toString().substring(0, 6),
+			"Leaderboard test edition"
+		);
 		edition = editionRepository.save(edition);
 		currentEditionId = edition.getId();
 		return edition;
@@ -174,12 +174,8 @@ public class LeaderboardStepDefs {
 	}
 
 	private Team createTeam(String teamAlias) {
-		Team team = new Team();
 		String teamName = teamAlias + "-" + UUID.randomUUID().toString().substring(0, 6);
-		team.setName(teamName);
-		team.setCity("Igualada");
-		team.setFoundationYear(2000);
-		team.setCategory("Challenge");
+		Team team = Team.create(teamName, "Igualada", 2000, "Challenge");
 		team.setEducationalCenter("EPS");
 		team.setInscriptionDate(LocalDate.now());
 		teamNameByAlias.put(teamAlias, teamName);
@@ -196,10 +192,7 @@ public class LeaderboardStepDefs {
 		match.setEndTime(LocalTime.of(11, 0));
 		match = matchRepository.save(match);
 
-		MatchResult result = new MatchResult();
-		result.setMatch(match);
-		result.setTeam(team);
-		result.setScore(score);
+		MatchResult result = MatchResult.create(score, match, team);
 		matchResultRepository.save(result);
 	}
 }

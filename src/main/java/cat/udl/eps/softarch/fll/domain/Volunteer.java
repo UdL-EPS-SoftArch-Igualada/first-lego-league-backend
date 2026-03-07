@@ -40,8 +40,11 @@ public abstract class Volunteer extends UriEntity<Long> {
 
 	@NotBlank(message = "Phone number is mandatory")
 	private String phoneNumber;
-  
-  protected Volunteer() {
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "edition_id")
+	private Edition edition;
+
+	protected Volunteer() {
 	}
 
 	protected void validateFields(String name, String emailAddress, String phoneNumber) {
@@ -57,9 +60,5 @@ public abstract class Volunteer extends UriEntity<Long> {
 		this.emailAddress = emailAddress;
 		this.phoneNumber = phoneNumber;
 	}
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "edition_id")
-	private Edition edition;
 }
 
