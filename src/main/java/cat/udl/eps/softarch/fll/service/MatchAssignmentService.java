@@ -56,15 +56,6 @@ public class MatchAssignmentService {
 		return matchRepository.save(match);
 	}
 
-	/**
-	 * Assigns referees to multiple matches of one round in a single atomic operation.
-	 *
-	 * Preconditions: `roundId` and all item IDs are numeric strings; every assignment item references an existing
-	 * scheduled/non-finished match from the given round and a volunteer with Referee role.
-	 * Postconditions: either all assignments are persisted, or none are persisted if any validation fails.
-	 * Exceptions: throws {@link MatchAssignmentException} with per-item details for batch failures.
-	 * Atomicity: all-or-nothing due to transactional execution.
-	 */
 	@Transactional
 	public BatchMatchAssignmentResponse assignBatch(String roundId, List<BatchMatchAssignmentItemRequest> assignments) {
 		Long parsedRoundId = parseIdOrThrow(roundId);
@@ -140,13 +131,6 @@ public class MatchAssignmentService {
 		return new BatchMatchAssignmentResponse(roundId, "ASSIGNED", responseItems.size(), responseItems);
 	}
 
-	/**
-	 * Checks overlap conflicts between candidates inside the same batch payload.
-	 *
-	 * Preconditions: each candidate already passed single-item DB validations.
-	 * Postconditions: no two overlapping matches share the same referee inside the batch.
-	 * Exceptions: throws {@link MatchAssignmentException} with failing item details.
-	 */
 	void validateBatchInternalConflicts(List<ResolvedAssignmentCandidate> candidates) {
 		Map<Long, List<ResolvedAssignmentCandidate>> candidatesByReferee = new HashMap<>();
 		for (ResolvedAssignmentCandidate candidate : candidates) {
@@ -182,13 +166,6 @@ public class MatchAssignmentService {
 		return null;
 	}
 
-	/**
-	 * Persists all validated candidates as a single batch update.
-	 *
-	 * Preconditions: every candidate is fully validated.
-	 * Postconditions: all matches are persisted with assigned referees.
-	 * Exceptions: propagated persistence exceptions trigger transaction rollback.
-	 */
 	void applyBatchAssignments(List<ResolvedAssignmentCandidate> candidates) {
 		List<Match> matchesToUpdate = candidates.stream()
 				.map(ResolvedAssignmentCandidate::match)
