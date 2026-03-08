@@ -3,6 +3,7 @@ package cat.udl.eps.softarch.fll.service;
 import java.time.LocalTime;
 import cat.udl.eps.softarch.fll.dto.MatchSearchItemResponse;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import cat.udl.eps.softarch.fll.domain.Match;
 import cat.udl.eps.softarch.fll.repository.MatchRepository;
 import cat.udl.eps.softarch.fll.repository.MatchSpecifications;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +27,15 @@ public class MatchSearchService {
 		Pageable pageable) {
 
 		validateTimeRange(startFrom, endTo);
+
+		if (pageable.getSort().isUnsorted()) {
+			pageable = PageRequest.of(
+				pageable.getPageNumber(),
+				pageable.getPageSize(),
+				Sort.by("startTime").ascending()
+					.and(Sort.by("id").ascending())
+			);
+		}
 
 		Specification<Match> spec =
 			Specification.where(MatchSpecifications.timeOverlap(startFrom, endTo))

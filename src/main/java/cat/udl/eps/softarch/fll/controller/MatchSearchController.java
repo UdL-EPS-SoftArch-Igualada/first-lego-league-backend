@@ -22,7 +22,7 @@ public class MatchSearchController {
 
 	private final MatchSearchService matchSearchService;
 
-	@GetMapping("/search")
+	@GetMapping("/filter")
 	public ResponseEntity<Object> searchMatches(
 		@RequestParam(name = "startFrom", required = false)
 		@DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startFrom,

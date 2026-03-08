@@ -11,10 +11,6 @@ public class MatchSpecifications {
 	public static Specification<Match> timeOverlap(LocalTime startFrom, LocalTime endTo) {
 		return (root, query, cb) -> {
 
-			if (startFrom == null && endTo == null) {
-				return null;
-			}
-
 			if (startFrom != null && endTo != null) {
 				return cb.and(
 					cb.lessThan(root.get("startTime"), endTo),
@@ -23,10 +19,14 @@ public class MatchSpecifications {
 			}
 
 			if (startFrom != null) {
-				return cb.greaterThanOrEqualTo(root.get("endTime"), startFrom);
+				return cb.greaterThan(root.get("endTime"), startFrom);
 			}
 
-			return cb.lessThanOrEqualTo(root.get("startTime"), endTo);
+			if (endTo != null) {
+				return cb.lessThan(root.get("startTime"), endTo);
+			}
+
+			return cb.conjunction();
 		};
 	}
 

@@ -22,6 +22,8 @@ public class MatchSearchStepDefs {
 	private RoundRepository roundRepository;
 	private CompetitionTableRepository tableRepository;
 
+	private Long currentRoundId;
+
 	public MatchSearchStepDefs(StepDefs stepDefs,
 							   MatchRepository matchRepository,
 							   RoundRepository roundRepository,
@@ -49,6 +51,7 @@ public class MatchSearchStepDefs {
 
 		Round round = new Round();
 		round = roundRepository.save(round);
+		currentRoundId = round.getId();
 
 		Match match1 = new Match();
 		match1.setStartTime(LocalTime.of(10, 0));
@@ -76,11 +79,11 @@ public class MatchSearchStepDefs {
 	}
 
 	@When("I search matches with table {string} and round {int}")
-	public void iSearchMatchesWithTableAndRound(String tableId, Integer roundId) throws Exception {
+	public void iSearchMatchesWithTableAndRound(String tableId, Integer roundNumber) throws Exception {
 		stepDefs.result = stepDefs.mockMvc.perform(
 			get("/matches/search")
 				.param("tableId", tableId)
-				.param("roundId", String.valueOf(roundId))
+				.param("roundId", String.valueOf(currentRoundId))
 				.with(user("admin"))
 				.contentType(MediaType.APPLICATION_JSON)
 		);
