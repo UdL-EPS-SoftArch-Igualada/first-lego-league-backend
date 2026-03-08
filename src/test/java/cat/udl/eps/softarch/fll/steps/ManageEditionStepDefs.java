@@ -20,7 +20,7 @@ import io.cucumber.java.en.When;
 public class ManageEditionStepDefs {
 	private final StepDefs stepDefs;
 	private final EditionRepository editionRepository;
-	private String editionUri;
+	String editionUri;
 
 	public ManageEditionStepDefs(StepDefs stepDefs, EditionRepository editionRepository) {
 		this.stepDefs = stepDefs;
