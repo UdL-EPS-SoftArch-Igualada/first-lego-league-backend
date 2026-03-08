@@ -25,7 +25,7 @@ public interface TeamRepository extends CrudRepository<Team, String>, PagingAndS
 	Optional<Team> findByName(@Param("name") String name);
 
 	@RestResource(exported = false)
-	boolean existsByIdAndRegisteredEditionsId(String teamId, Long editionId);
+	boolean existsByIdAndRegisteredEditionsId(String teamName, Long editionId);
 
 	@RestResource(exported = false)
 	@Query("select distinct t from Team t left join fetch t.registeredEditions where t.name = :name")

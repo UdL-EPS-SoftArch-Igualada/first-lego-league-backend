@@ -110,12 +110,18 @@ public class ManageScientificProjectStepDefs {
 	}
 
 	private Long extractEditionId(String editionUri) {
+		if (editionUri == null) {
+			throw new IllegalArgumentException("editionUri must not be null");
+		}
 		String path = URI.create(editionUri).getPath();
 		String[] parts = path.split("/");
 		return Long.parseLong(parts[parts.length - 1]);
 	}
 
 	private String extractTeamName(String teamUri) {
+		if (teamUri == null) {
+			throw new IllegalArgumentException("teamUri must not be null");
+		}
 		String path = URI.create(teamUri).getPath();
 		String[] parts = path.split("/");
 		return UriUtils.decode(parts[parts.length - 1], StandardCharsets.UTF_8);
@@ -170,7 +176,7 @@ public class ManageScientificProjectStepDefs {
 	public void iCreateScientificProjectWithInvalidTeamWithValidEdition(Integer score, String comments) throws Exception {
 		latestScientificProjectUri = null;
 		String editionUri = createEdition();
-		String invalidTeamUri = "non-existing-" + UUID.randomUUID();
+		String invalidTeamUri = "http://localhost/teams/" + UriUtils.encodePathSegment("UnknownTeam-" + UUID.randomUUID(), StandardCharsets.UTF_8);
 		stepDefs.result = performCreateProject(score, comments, invalidTeamUri, editionUri);
 		captureLatestProjectUriIfCreated();
 	}
@@ -179,7 +185,7 @@ public class ManageScientificProjectStepDefs {
 	public void iCreateScientificProjectWithInvalidEdition(Integer score, String comments, String teamName) throws Exception {
 		latestScientificProjectUri = null;
 		String teamUri = ensureTeamExists(teamName);
-		String invalidEditionUri = "non-existing-" + UUID.randomUUID();
+		String invalidEditionUri = "http://localhost/editions/999999999";
 		stepDefs.result = performCreateProject(score, comments, teamUri, invalidEditionUri);
 		captureLatestProjectUriIfCreated();
 	}
