@@ -15,10 +15,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public interface AwardRepository extends JpaRepository<Award, Long> {
 
 	@Operation(summary = "Find awards by edition",
-			description = "Returns all awards presented in a specific edition.")
+		description = "Returns all awards presented in a specific edition.")
 	List<Award> findByEdition(@Param("edition") Edition edition);
 
 	@Operation(summary = "Find awards by winner",
-			description = "Returns all awards won by a specific team.")
+		description = "Returns all awards won by a specific team.")
 	List<Award> findByWinner(@Param("winner") Team winner);
+
+	@Operation(summary = "Find awards by partial winner name",
+		description = "Returns all awards where the winning team's name contains the given string (case-insensitive).")
+	List<Award> findByWinnerNameContainingIgnoreCase(@Param("name") String name);
 }
