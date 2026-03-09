@@ -55,4 +55,17 @@ public interface MatchRepository extends
 	@Query("SELECT m FROM Match m WHERE m.id = :id")
 	@RestResource(exported = false)
 	Optional<Match> findByIdForUpdate(@Param("id") Long id);
+
+	@Query("""
+			SELECT m FROM Match m
+			WHERE m.competitionTable.id = :tableId
+			AND m.startTime < :newEndTime
+			AND m.endTime > :newStartTime
+			AND (:currentMatchId IS NULL OR m.id <> :currentMatchId)
+			""")
+	List<Match> findOverlappingMatchesByTable(
+			@Param("tableId") String tableId,
+			@Param("newStartTime") LocalTime newStartTime,
+			@Param("newEndTime") LocalTime newEndTime,
+			@Param("currentMatchId") Long currentMatchId);
 }
