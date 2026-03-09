@@ -37,8 +37,8 @@ Feature: Manage Venue
     Scenario: Search venues by city returns matching results
         Given I login as "demo" with password "password"
         And There is no venue with name "City Search Venue"
-        And There is a venue with name "City Search Venue" and city "Barcelona"
-        When I search venues by city "Barcelona"
+        And There is a venue with name "City Search Venue" and city "CitySearchVille"
+        When I search venues by city "CitySearchVille"
         Then The response code is 200
         And The venue search response should contain 1 venue
         And The venue search response should include venue named "City Search Venue"
