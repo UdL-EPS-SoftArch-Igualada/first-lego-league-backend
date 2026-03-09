@@ -152,6 +152,9 @@ public class AwardAndMatchStepDefs {
 			.content(editionJson.toString())
 			.characterEncoding(StandardCharsets.UTF_8)
 			.with(AuthenticationStepDefs.authenticate())).andReturn().getResponse();
+			if (edRes.getStatus() != 201 || edRes.getHeader("Location") == null) {
+				throw new RuntimeException("Failed to create edition: " + edRes.getContentAsString());
+			}
 		editionUri = edRes.getHeader("Location");
 
 		JSONObject teamJson = new JSONObject();
@@ -165,6 +168,9 @@ public class AwardAndMatchStepDefs {
 			.content(teamJson.toString())
 			.characterEncoding(StandardCharsets.UTF_8)
 			.with(AuthenticationStepDefs.authenticate())).andReturn().getResponse();
+			if (teamRes.getStatus() != 201 || teamRes.getHeader("Location") == null) {
+				throw new RuntimeException("Failed to create team: " + teamRes.getContentAsString());
+			}
 		teamUri = teamRes.getHeader("Location");
 
 		JSONObject awardJson = new JSONObject();
