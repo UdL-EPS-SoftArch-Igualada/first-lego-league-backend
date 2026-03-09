@@ -11,7 +11,8 @@ import org.springframework.http.MediaType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Random;
+import java.util.random.RandomGenerator;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -40,7 +41,7 @@ public class ProjectRoomSteps {
 
 	@Given("a judge {string} exists")
 	public void a_judge_exists(String judgeAlias) {
-		Judge judge = Judge.create("Test Judge " + judgeAlias, "judge_" + UUID.randomUUID().toString().substring(0, 8) + "@test.com", "123456789");
+		Judge judge = Judge.create("Test Judge " + judgeAlias, "judge_" + Random.from(RandomGenerator.getDefault()).nextFloat() + "@test.com", "123456789");
 		judge = judgeRepository.save(judge);
 		judgeIdMap.put(judgeAlias, judge.getId());
 	}
@@ -58,7 +59,7 @@ public class ProjectRoomSteps {
 	public void the_room_already_has_panelists(String roomId, int count) {
 		ProjectRoom room = roomRepository.findById(roomId).orElseThrow();
 		for (int i = 0; i < count; i++) {
-			Judge panelist = Judge.create("Panelist " + i, "p" + UUID.randomUUID().toString().substring(0, 4) + "@test.com", "111");
+			Judge panelist = Judge.create("Panelist " + i, "p" + Random.from(RandomGenerator.getDefault()).nextFloat() + "@test.com", "111");
 			panelist.setMemberOfRoom(room);
 			judgeRepository.save(panelist);
 		}

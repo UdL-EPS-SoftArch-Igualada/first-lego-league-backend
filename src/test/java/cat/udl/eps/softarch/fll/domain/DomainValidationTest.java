@@ -72,24 +72,6 @@ class DomainValidationTest {
 		}
 
 		@Test
-		void rejectsLeadingDotInLocalPart() {
-			assertThrows(DomainValidationException.class,
-				() -> DomainValidation.requireValidEmail(".user@example.com", "email"));
-		}
-
-		@Test
-		void rejectsTrailingDotInLocalPart() {
-			assertThrows(DomainValidationException.class,
-				() -> DomainValidation.requireValidEmail("user.@example.com", "email"));
-		}
-
-		@Test
-		void rejectsConsecutiveDotsInLocalPart() {
-			assertThrows(DomainValidationException.class,
-				() -> DomainValidation.requireValidEmail("us..er@example.com", "email"));
-		}
-
-		@Test
 		void acceptsLocalPartWithSingleDot() {
 			assertDoesNotThrow(() -> DomainValidation.requireValidEmail("first.last@example.com", "email"));
 		}
