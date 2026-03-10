@@ -42,6 +42,10 @@ public class User extends UriEntity<String> implements UserDetails {
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private boolean passwordReset;
 
+	@NotBlank
+	@Column(nullable = false)
+	private String roles = "ROLE_USER";
+
 	public void encodePassword() {
 		this.password = passwordEncoder.encode(this.password);
 	}
@@ -59,7 +63,7 @@ public class User extends UriEntity<String> implements UserDetails {
 	@JsonValue(value = false)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER");
+		return AuthorityUtils.commaSeparatedStringToAuthorityList(roles);
 	}
 
 	@Override

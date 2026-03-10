@@ -23,19 +23,23 @@ public class WebSecurityConfig {
 	@Value("${allowed-origins}")
 	String[] allowedOrigins;
 
+	private static final String THREE_LEVEL_PATH = "/*/*/*";
+
 	@Bean
 	protected SecurityFilterChain securityFilterChain(HttpSecurity http) {
 		http.authorizeHttpRequests(auth -> auth
 				.requestMatchers(HttpMethod.GET, "/identity").authenticated()
 				.requestMatchers(HttpMethod.GET, "/users").authenticated()
-				.requestMatchers(HttpMethod.GET, "/editions/*/volunteers").authenticated()
 				.requestMatchers(HttpMethod.POST, "/users").anonymous()
-				.requestMatchers(HttpMethod.POST, "/matchResults/register").authenticated()
 				.requestMatchers(HttpMethod.POST, "/users/*").denyAll()
 				.requestMatchers(HttpMethod.POST, "/*/*").authenticated()
 				.requestMatchers(HttpMethod.PUT, "/*/*").authenticated()
 				.requestMatchers(HttpMethod.PATCH, "/*/*").authenticated()
 				.requestMatchers(HttpMethod.DELETE, "/*/*").authenticated()
+				.requestMatchers(HttpMethod.POST, THREE_LEVEL_PATH).authenticated()
+				.requestMatchers(HttpMethod.PUT, THREE_LEVEL_PATH).authenticated()
+				.requestMatchers(HttpMethod.PATCH, THREE_LEVEL_PATH).authenticated()
+				.requestMatchers(HttpMethod.DELETE, THREE_LEVEL_PATH).authenticated()
 				.anyRequest().permitAll())
 				.csrf(csrf -> csrf.disable())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
