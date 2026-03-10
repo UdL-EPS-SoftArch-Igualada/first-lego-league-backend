@@ -1,6 +1,7 @@
 package cat.udl.eps.softarch.fll.steps;
 
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -111,6 +112,17 @@ public class TeamMemberStepDefs {
 				.andDo(print());
 	}
 
+	@When("I search team members by role {string}")
+	public void iSearchTeamMembersByRole(String role) throws Exception {
+		stepDefs.result = stepDefs.mockMvc.perform(
+				get("/teamMembers/search/findByRole")
+						.param("role", role)
+						.accept(MediaType.APPLICATION_JSON)
+						.characterEncoding(StandardCharsets.UTF_8)
+						.with(AuthenticationStepDefs.authenticate()))
+				.andDo(print());
+	}
+
 	@When("I delete the created team member")
 	public void iDeleteTheCreatedTeamMember() throws Exception {
 		assertLatestTeamMemberIdPresent();
@@ -162,6 +174,11 @@ public class TeamMemberStepDefs {
 	@And("The team member list contains name {string}")
 	public void theTeamMemberListContainsName(String expectedName) throws Exception {
 		stepDefs.result.andExpect(jsonPath("$._embedded.teamMembers[*].name", hasItem(is(expectedName))));
+	}
+
+	@And("The team member list is empty")
+	public void theTeamMemberListIsEmpty() throws Exception {
+		stepDefs.result.andExpect(jsonPath("$._embedded.teamMembers", hasSize(0)));
 	}
 
 	private JSONObject buildTeamMemberPayload(String name, String birthDate, String role, String teamName) throws Exception {

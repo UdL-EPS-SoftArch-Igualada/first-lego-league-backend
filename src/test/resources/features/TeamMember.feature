@@ -46,6 +46,24 @@ Feature: TeamMember REST CRUD
         And The team member list contains name "Mia"
         And The team member list contains name "Noah"
 
+    Scenario: Retrieve team members by role returns results
+        Given a team with name "RoleTeam" exists for team member management
+        And I create a team member with name "Pol" birth date "2010-01-01" and role "Captain" for team "RoleTeam"
+        And The response code is 201
+        And I create a team member with name "Nora" birth date "2011-05-05" and role "Designer" for team "RoleTeam"
+        And The response code is 201
+        When I search team members by role "Captain"
+        Then The response code is 200
+        And The team member list contains name "Pol"
+
+    Scenario: Retrieve team members by role returns empty list when none match
+        Given a team with name "EmptyRoleTeam" exists for team member management
+        And I create a team member with name "Lia" birth date "2010-08-08" and role "Programmer" for team "EmptyRoleTeam"
+        And The response code is 201
+        When I search team members by role "Unknown"
+        Then The response code is 200
+        And The team member list is empty
+
     Scenario: Deleting a team member
         Given a team with name "DeleteTeam" exists for team member management
         And I create a team member with name "Eva" birth date "2010-09-09" and role "Researcher" for team "DeleteTeam"
