@@ -154,7 +154,8 @@ public class MatchSearchStepDefs {
 
 	@Given("a team {string} exists with matches")
 	public void aTeamExistsWithMatches(String teamName) {
-		Team team = new Team(teamName);
+		Team team = new Team();
+		team.setName(teamName);
 		team.setCity("Barcelona");
 		team.setFoundationYear(2010);
 		team.setCategory("Challenge");
@@ -180,7 +181,8 @@ public class MatchSearchStepDefs {
 
 	@Given("a team {string} exists with no matches")
 	public void aTeamExistsWithNoMatches(String teamName) {
-		Team team = new Team(teamName);
+		Team team = new Team();
+		team.setName(teamName);
 		team.setCity("Lleida");
 		team.setFoundationYear(2012);
 		team.setCategory("Challenge");
