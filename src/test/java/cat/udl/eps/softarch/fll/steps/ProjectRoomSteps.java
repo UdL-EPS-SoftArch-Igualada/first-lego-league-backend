@@ -15,15 +15,24 @@ import org.springframework.http.MediaType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+<<<<<<< search-endpoint-TeamMember
 import java.util.UUID;
 
+=======
+import java.util.Random;
+import java.util.random.RandomGenerator;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+>>>>>>> main
 
 public class ProjectRoomSteps {
 
 	private final StepDefs stepDefs;
 	private final ProjectRoomRepository roomRepository;
 	private final JudgeRepository judgeRepository;
-	private Map<String, Long> judgeIdMap = new HashMap<>();
+	private final Map<String, Long> judgeIdMap = new HashMap<>();
 
 	public ProjectRoomSteps(StepDefs stepDefs, ProjectRoomRepository roomRepository, JudgeRepository judgeRepository) {
 		this.stepDefs = stepDefs;
@@ -41,10 +50,7 @@ public class ProjectRoomSteps {
 
 	@Given("a judge {string} exists")
 	public void a_judge_exists(String judgeAlias) {
-		Judge judge = new Judge();
-		judge.setName("Test Judge " + judgeAlias);
-		judge.setEmailAddress("judge_" + UUID.randomUUID().toString().substring(0, 8) + "@test.com");
-		judge.setPhoneNumber("123456789");
+		Judge judge = Judge.create("Test Judge " + judgeAlias, "judge_" + Random.from(RandomGenerator.getDefault()).nextFloat() + "@test.com", "123456789");
 		judge = judgeRepository.save(judge);
 		judgeIdMap.put(judgeAlias, judge.getId());
 	}
@@ -52,10 +58,7 @@ public class ProjectRoomSteps {
 	@Given("the room {string} already has a manager")
 	public void the_room_already_has_a_manager(String roomId) {
 		ProjectRoom room = roomRepository.findById(roomId).orElseThrow();
-		Judge manager = new Judge();
-		manager.setName("Manager");
-		manager.setEmailAddress("manager@test.com");
-		manager.setPhoneNumber("000");
+		Judge manager = Judge.create("Manager", "manager@test.com", "000");
 		manager = judgeRepository.save(manager);
 		room.setManagedByJudge(manager);
 		roomRepository.save(room);
@@ -65,10 +68,7 @@ public class ProjectRoomSteps {
 	public void the_room_already_has_panelists(String roomId, int count) {
 		ProjectRoom room = roomRepository.findById(roomId).orElseThrow();
 		for (int i = 0; i < count; i++) {
-			Judge panelist = new Judge();
-			panelist.setName("Panelist " + i);
-			panelist.setEmailAddress("p" + UUID.randomUUID().toString().substring(0, 4) + "@test.com");
-			panelist.setPhoneNumber("111");
+			Judge panelist = Judge.create("Panelist " + i, "p" + Random.from(RandomGenerator.getDefault()).nextFloat() + "@test.com", "111");
 			panelist.setMemberOfRoom(room);
 			judgeRepository.save(panelist);
 		}
@@ -89,13 +89,19 @@ public class ProjectRoomSteps {
 		String judgeId = judgeIdMap.containsKey(judgeAlias) ? String.valueOf(judgeIdMap.get(judgeAlias)) : judgeAlias;
 
 		String jsonPayload = String.format(
+<<<<<<< search-endpoint-TeamMember
 				"{\"roomId\": \"%s\", \"judgeId\": \"%s\", \"isManager\": %b}",
 				roomId, judgeId, isManager);
+=======
+			"{\"roomId\": \"%s\", \"judgeId\": \"%s\", \"isManager\": %b}",
+			roomId, judgeId, isManager
+		);
+>>>>>>> main
 
 		stepDefs.result = stepDefs.mockMvc.perform(post("/project-rooms/assign-judge")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(jsonPayload)
-				.with(user("admin").roles("ADMIN")));
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(jsonPayload)
+			.with(user("admin").roles("ADMIN")));
 	}
 
 	@Then("the response status should be {int}")
@@ -106,7 +112,11 @@ public class ProjectRoomSteps {
 	@Then("the response role should be {string}")
 	public void the_response_role_should_be(String expectedRole) throws Throwable {
 		stepDefs.result.andExpect(jsonPath("$.role").value(expectedRole))
+<<<<<<< search-endpoint-TeamMember
 				.andExpect(jsonPath("$.status").value("ASSIGNED"));
+=======
+			.andExpect(jsonPath("$.status").value("ASSIGNED"));
+>>>>>>> main
 	}
 
 	@Then("the response error should be {string}")

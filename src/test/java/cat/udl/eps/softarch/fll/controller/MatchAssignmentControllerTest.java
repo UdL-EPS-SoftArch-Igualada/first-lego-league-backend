@@ -35,16 +35,16 @@ class MatchAssignmentControllerTest {
 		validator.afterPropertiesSet();
 
 		mockMvc = MockMvcBuilders.standaloneSetup(controller)
-				.setControllerAdvice(new MatchAssignmentExceptionHandler())
-				.setValidator(validator)
-				.build();
+			.setControllerAdvice(new MatchAssignmentExceptionHandler())
+			.setValidator(validator)
+			.build();
 	}
 
 	@Test
 	void assignRefereeReturnsAssignedResponse() throws Exception {
 		Match match = new Match();
 		match.setId(1L);
-		Referee referee = new Referee();
+		Referee referee = Referee.create("name", "email@email.com", "123456789");
 		referee.setId(2L);
 		match.setReferee(referee);
 
@@ -62,9 +62,9 @@ class MatchAssignmentControllerTest {
 	@Test
 	void assignRefereeReturnsErrorResponse() throws Exception {
 		when(matchAssignmentService.assignReferee("1", "2")).thenThrow(
-				new MatchAssignmentException(
-						MatchAssignmentErrorCode.AVAILABILITY_CONFLICT,
-						"Referee is already assigned to another overlapping match"));
+			new MatchAssignmentException(
+				MatchAssignmentErrorCode.AVAILABILITY_CONFLICT,
+				"Referee is already assigned to another overlapping match"));
 
 		mockMvc.perform(post("/matchAssignments/assign")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -80,51 +80,51 @@ class MatchAssignmentControllerTest {
 	@Test
 	void assignBatchReturnsAssignedResponse() throws Exception {
 		BatchMatchAssignmentResponse response = new BatchMatchAssignmentResponse(
-				"3",
-				"ASSIGNED",
-				2,
-				List.of(
-						new BatchMatchAssignmentItemResponse("10", "20", "ASSIGNED"),
-						new BatchMatchAssignmentItemResponse("11", "21", "ASSIGNED")));
+			"3",
+			"ASSIGNED",
+			2,
+			List.of(
+				new BatchMatchAssignmentItemResponse("10", "20", "ASSIGNED"),
+				new BatchMatchAssignmentItemResponse("11", "21", "ASSIGNED")));
 
 		when(matchAssignmentService.assignBatch(
-				"3",
-				List.of(
-						new BatchMatchAssignmentItemRequest("10", "20"),
-						new BatchMatchAssignmentItemRequest("11", "21")))).thenReturn(response);
+			"3",
+			List.of(
+				new BatchMatchAssignmentItemRequest("10", "20"),
+				new BatchMatchAssignmentItemRequest("11", "21")))).thenReturn(response);
 
 		mockMvc.perform(post("/matchAssignments/batch")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("""
-						{
-						  "roundId": "3",
-						  "assignments": [
-						    {"matchId":"10","refereeId":"20"},
-						    {"matchId":"11","refereeId":"21"}
-						  ]
-						}
-						"""))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.roundId").value("3"))
-				.andExpect(jsonPath("$.status").value("ASSIGNED"))
-				.andExpect(jsonPath("$.processed").value(2))
-				.andExpect(jsonPath("$.assignments[0].matchId").value("10"))
-				.andExpect(jsonPath("$.assignments[1].refereeId").value("21"));
+					{
+					  "roundId": "3",
+					  "assignments": [
+					    {"matchId":"10","refereeId":"20"},
+					    {"matchId":"11","refereeId":"21"}
+					  ]
+					}
+					"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.roundId").value("3"))
+			.andExpect(jsonPath("$.status").value("ASSIGNED"))
+			.andExpect(jsonPath("$.processed").value(2))
+			.andExpect(jsonPath("$.assignments[0].matchId").value("10"))
+			.andExpect(jsonPath("$.assignments[1].refereeId").value("21"));
 	}
 
 	@Test
 	void assignBatchReturnsDetailedErrorResponse() throws Exception {
 		when(matchAssignmentService.assignBatch(
-				"3",
-				List.of(
-						new BatchMatchAssignmentItemRequest("10", "20"),
-						new BatchMatchAssignmentItemRequest("11", "20")))).thenThrow(
-								new MatchAssignmentException(
-										MatchAssignmentErrorCode.AVAILABILITY_CONFLICT,
-										"Referee is assigned to overlapping matches in the same batch",
-										1,
-										"11",
-										"20"));
+			"3",
+			List.of(
+				new BatchMatchAssignmentItemRequest("10", "20"),
+				new BatchMatchAssignmentItemRequest("11", "20")))).thenThrow(
+			new MatchAssignmentException(
+				MatchAssignmentErrorCode.AVAILABILITY_CONFLICT,
+				"Referee is assigned to overlapping matches in the same batch",
+				1,
+				"11",
+				"20"));
 
 		mockMvc.perform(post("/matchAssignments/batch")
 				.contentType(MediaType.APPLICATION_JSON)

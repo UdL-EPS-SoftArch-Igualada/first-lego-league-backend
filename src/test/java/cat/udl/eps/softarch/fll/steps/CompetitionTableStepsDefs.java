@@ -1,13 +1,13 @@
 package cat.udl.eps.softarch.fll.steps;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import cat.udl.eps.softarch.fll.domain.CompetitionTable;
 import cat.udl.eps.softarch.fll.domain.Referee;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class CompetitionTableStepsDefs {
 
@@ -24,7 +24,7 @@ public class CompetitionTableStepsDefs {
 
 	@When("I add a referee named {string} to the table")
 	public void i_add_a_referee_named_to_the_table(String name) {
-		namedReferee = new Referee();
+		namedReferee = Referee.create(name, "test@gmail.com", "123456789");
 		namedRefereeName = name;
 		table.addReferee(namedReferee);
 	}
@@ -32,7 +32,7 @@ public class CompetitionTableStepsDefs {
 	@Then("the table should have {int} referee")
 	public void the_table_should_have_referee(Integer expectedCount) {
 		assertEquals(expectedCount, table.getReferees().size(),
-				"The table does not have the expected number of referees");
+			"The table does not have the expected number of referees");
 	}
 
 	@Then("the referee {string} should be supervising {string}")
@@ -41,19 +41,22 @@ public class CompetitionTableStepsDefs {
 
 		assertNotNull(namedReferee.getSupervisesTable(), "The referee is not assigned to any table");
 		assertEquals(expectedTableId, namedReferee.getSupervisesTable().getId(),
-				"The referee is assigned to the wrong table");
+			"The referee is assigned to the wrong table");
 	}
 
 	@Given("the table already has {int} referees")
 	public void the_table_already_has_referees(Integer count) {
 		for (int i = 0; i < count; i++) {
-			table.addReferee(new Referee());
+			Referee referee = Referee.create("Referee" + i, "pep@gmail.com", "123456789");
+			referee.setId(i + 1L);
+			table.addReferee(referee);
 		}
 	}
 
 	@When("I try to add another referee to the table")
 	public void i_try_to_add_another_referee_to_the_table() {
-		Referee extraReferee = new Referee();
+		Referee extraReferee = Referee.create("Another Referee", "pep@gmail.com", "123456789");
+		extraReferee.setId(10000L);
 		try {
 			table.addReferee(extraReferee);
 		} catch (Exception e) {
@@ -64,8 +67,7 @@ public class CompetitionTableStepsDefs {
 	@Then("the validation should prevent adding a 4th referee")
 	public void the_validation_should_prevent_adding_a_4th_referee() {
 		assertNotNull(thrownException, "An exception should have been thrown when adding the 4th referee");
-		assertTrue(thrownException instanceof IllegalStateException,
-				"The exception should be an IllegalStateException");
+		assertInstanceOf(IllegalStateException.class, thrownException, "The exception should be an IllegalStateException");
 		assertEquals("A table can have a maximum of 3 referees", thrownException.getMessage());
 		assertEquals(3, table.getReferees().size(), "The table should strictly contain 3 referees");
 	}

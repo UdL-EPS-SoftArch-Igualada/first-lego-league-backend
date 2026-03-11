@@ -1,13 +1,13 @@
 package cat.udl.eps.softarch.fll.steps;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import cat.udl.eps.softarch.fll.domain.CompetitionTable;
 import cat.udl.eps.softarch.fll.domain.Referee;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class RefereeStepsDefs {
@@ -17,7 +17,7 @@ public class RefereeStepsDefs {
 
 	@Given("a new referee")
 	public void a_new_referee() {
-		referee = new Referee();
+		referee = Referee.create("Default Referee", "pep@gmail.com", "123456789");
 	}
 
 	@When("I set the referee as an expert")

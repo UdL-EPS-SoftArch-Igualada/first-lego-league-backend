@@ -27,17 +27,23 @@ public class ScientificProject extends UriEntity<Long> {
 	private Integer score;
 
 	private String comments;
-
 	@NotNull
 	@ManyToOne
 	@JoinColumn(name = "team_name", nullable = false)
 	@JsonIdentityReference(alwaysAsId = true)
 	private Team team;
-
 	@NotNull
 	@ManyToOne
 	@JoinColumn(name = "edition_id", nullable = false)
 	@JsonIdentityReference(alwaysAsId = true)
 	private Edition edition;
+
+	public static ScientificProject create(Integer score) {
+		DomainValidation.requireNonNegative(score, "score");
+
+		ScientificProject project = new ScientificProject();
+		project.score = score;
+		return project;
+	}
 }
 

@@ -1,5 +1,13 @@
 package cat.udl.eps.softarch.fll.steps;
 
+import cat.udl.eps.softarch.fll.domain.MediaContent;
+import cat.udl.eps.softarch.fll.repository.MediaContentRepository;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.When;
+import org.springframework.http.MediaType;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -8,14 +16,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import org.springframework.http.MediaType;
-import cat.udl.eps.softarch.fll.domain.MediaContent;
-import cat.udl.eps.softarch.fll.repository.MediaContentRepository;
-import io.cucumber.java.en.And;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.When;
 
 public class ManageMediaContentStepDefs {
 	private final StepDefs stepDefs;
@@ -29,18 +29,16 @@ public class ManageMediaContentStepDefs {
 
 	@When("I create a new media content with url {string} and type {string}")
 	public void iCreateANewMediaContent(String url, String type) throws Exception {
-		MediaContent mediaContent = new MediaContent();
-		mediaContent.setUrl(url);
-		mediaContent.setType(type);
+		MediaContent mediaContent = MediaContent.create(url, type);
 
 		stepDefs.result = stepDefs.mockMvc.perform(
 				post("/mediaContents")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(stepDefs.mapper.writeValueAsString(mediaContent))
-						.characterEncoding(StandardCharsets.UTF_8)
-						.accept(MediaType.APPLICATION_JSON)
-						.with(AuthenticationStepDefs.authenticate()))
-				.andDo(print());
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(stepDefs.mapper.writeValueAsString(mediaContent))
+					.characterEncoding(StandardCharsets.UTF_8)
+					.accept(MediaType.APPLICATION_JSON)
+					.with(AuthenticationStepDefs.authenticate()))
+			.andDo(print());
 
 		mediaContentUri = stepDefs.result.andReturn().getResponse().getHeader("Location");
 	}
@@ -49,17 +47,15 @@ public class ManageMediaContentStepDefs {
 	public void theCreatedMediaContentHasType(String type) throws Exception {
 		stepDefs.result = stepDefs.mockMvc.perform(
 				get(mediaContentUri)
-						.accept(MediaType.APPLICATION_JSON)
-						.with(AuthenticationStepDefs.authenticate()))
-				.andDo(print())
-				.andExpect(jsonPath("$.type", is(type)));
+					.accept(MediaType.APPLICATION_JSON)
+					.with(AuthenticationStepDefs.authenticate()))
+			.andDo(print())
+			.andExpect(jsonPath("$.type", is(type)));
 	}
 
 	@Given("There is a media content with url {string} and type {string}")
 	public void thereIsAMediaContent(String url, String type) {
-		MediaContent mediaContent = new MediaContent();
-		mediaContent.setUrl(url);
-		mediaContent.setType(type);
+		MediaContent mediaContent = MediaContent.create(url, type);
 		mediaContentRepository.save(mediaContent);
 		mediaContentUri = "/mediaContents/" + url;
 	}
@@ -69,9 +65,9 @@ public class ManageMediaContentStepDefs {
 		mediaContentUri = "/mediaContents/" + url;
 		stepDefs.result = stepDefs.mockMvc.perform(
 				get(mediaContentUri)
-						.accept(MediaType.APPLICATION_JSON)
-						.with(AuthenticationStepDefs.authenticate()))
-				.andDo(print());
+					.accept(MediaType.APPLICATION_JSON)
+					.with(AuthenticationStepDefs.authenticate()))
+			.andDo(print());
 	}
 
 	@When("I update the media content with url {string} type to {string}")
@@ -79,40 +75,40 @@ public class ManageMediaContentStepDefs {
 		mediaContentUri = "/mediaContents/" + url;
 		stepDefs.result = stepDefs.mockMvc.perform(
 				patch(mediaContentUri)
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(stepDefs.mapper.writeValueAsString(Map.of("type", type)))
-						.characterEncoding(StandardCharsets.UTF_8)
-						.accept(MediaType.APPLICATION_JSON)
-						.with(AuthenticationStepDefs.authenticate()))
-				.andDo(print());
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(stepDefs.mapper.writeValueAsString(Map.of("type", type)))
+					.characterEncoding(StandardCharsets.UTF_8)
+					.accept(MediaType.APPLICATION_JSON)
+					.with(AuthenticationStepDefs.authenticate()))
+			.andDo(print());
 	}
 
 	@And("The retrieved media content has type {string}")
 	public void theRetrievedMediaContentHasType(String type) throws Exception {
 		stepDefs.result = stepDefs.mockMvc.perform(
 				get(mediaContentUri)
-						.accept(MediaType.APPLICATION_JSON)
-						.with(AuthenticationStepDefs.authenticate()))
-				.andDo(print())
-				.andExpect(jsonPath("$.type", is(type)));
+					.accept(MediaType.APPLICATION_JSON)
+					.with(AuthenticationStepDefs.authenticate()))
+			.andDo(print())
+			.andExpect(jsonPath("$.type", is(type)));
 	}
 
 	@When("I delete the media content with url {string}")
 	public void iDeleteTheMediaContent(String url) throws Exception {
 		stepDefs.result = stepDefs.mockMvc.perform(
 				delete("/mediaContents/" + url)
-						.accept(MediaType.APPLICATION_JSON)
-						.with(AuthenticationStepDefs.authenticate()))
-				.andDo(print());
+					.accept(MediaType.APPLICATION_JSON)
+					.with(AuthenticationStepDefs.authenticate()))
+			.andDo(print());
 	}
 
 	@And("The media content with url {string} has been deleted")
 	public void theMediaContentHasBeenDeleted(String url) throws Exception {
 		stepDefs.mockMvc.perform(
 				get("/mediaContents/" + url)
-						.accept(MediaType.APPLICATION_JSON)
-						.with(AuthenticationStepDefs.authenticate()))
-				.andDo(print())
-				.andExpect(status().isNotFound());
+					.accept(MediaType.APPLICATION_JSON)
+					.with(AuthenticationStepDefs.authenticate()))
+			.andDo(print())
+			.andExpect(status().isNotFound());
 	}
 }

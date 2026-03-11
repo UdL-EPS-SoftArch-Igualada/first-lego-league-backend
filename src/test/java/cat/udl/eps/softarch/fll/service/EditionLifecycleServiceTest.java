@@ -1,22 +1,22 @@
 package cat.udl.eps.softarch.fll.service;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import java.util.Optional;
+import cat.udl.eps.softarch.fll.domain.Edition;
+import cat.udl.eps.softarch.fll.domain.EditionOperation;
+import cat.udl.eps.softarch.fll.domain.EditionState;
+import cat.udl.eps.softarch.fll.exception.EditionLifecycleException;
+import cat.udl.eps.softarch.fll.repository.EditionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import cat.udl.eps.softarch.fll.domain.Edition;
-import cat.udl.eps.softarch.fll.domain.EditionOperation;
-import cat.udl.eps.softarch.fll.domain.EditionState;
-import cat.udl.eps.softarch.fll.exception.EditionLifecycleException;
-import cat.udl.eps.softarch.fll.repository.EditionRepository;
+import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class EditionLifecycleServiceTest {
@@ -31,7 +31,7 @@ class EditionLifecycleServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		edition = new Edition();
+		edition = Edition.create(2026, "Test Edition", "description");
 		edition.setId(1L);
 		edition.setState(EditionState.DRAFT);
 	}
@@ -67,8 +67,8 @@ class EditionLifecycleServiceTest {
 		when(editionRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(edition));
 
 		EditionLifecycleException ex = assertThrows(
-				EditionLifecycleException.class,
-				() -> editionLifecycleService.changeState(1L, EditionState.DRAFT));
+			EditionLifecycleException.class,
+			() -> editionLifecycleService.changeState(1L, EditionState.DRAFT));
 
 		assertEquals("INVALID_EDITION_STATE_TRANSITION", ex.getError());
 	}
@@ -79,8 +79,8 @@ class EditionLifecycleServiceTest {
 		when(editionRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(edition));
 
 		EditionLifecycleException ex = assertThrows(
-				EditionLifecycleException.class,
-				() -> editionLifecycleService.changeState(1L, EditionState.OPEN));
+			EditionLifecycleException.class,
+			() -> editionLifecycleService.changeState(1L, EditionState.OPEN));
 
 		assertEquals("INVALID_EDITION_STATE_TRANSITION", ex.getError());
 	}
@@ -91,8 +91,8 @@ class EditionLifecycleServiceTest {
 		when(editionRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(edition));
 
 		EditionLifecycleException ex = assertThrows(
-				EditionLifecycleException.class,
-				() -> editionLifecycleService.changeState(1L, EditionState.DRAFT));
+			EditionLifecycleException.class,
+			() -> editionLifecycleService.changeState(1L, EditionState.DRAFT));
 
 		assertEquals("INVALID_EDITION_STATE_TRANSITION", ex.getError());
 	}
@@ -102,8 +102,8 @@ class EditionLifecycleServiceTest {
 		when(editionRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(edition));
 
 		EditionLifecycleException ex = assertThrows(
-				EditionLifecycleException.class,
-				() -> editionLifecycleService.changeState(1L, EditionState.DRAFT));
+			EditionLifecycleException.class,
+			() -> editionLifecycleService.changeState(1L, EditionState.DRAFT));
 
 		assertEquals("INVALID_EDITION_STATE_TRANSITION", ex.getError());
 	}
@@ -113,8 +113,8 @@ class EditionLifecycleServiceTest {
 		when(editionRepository.findByIdForUpdate(1L)).thenReturn(Optional.empty());
 
 		EditionLifecycleException ex = assertThrows(
-				EditionLifecycleException.class,
-				() -> editionLifecycleService.changeState(1L, EditionState.OPEN));
+			EditionLifecycleException.class,
+			() -> editionLifecycleService.changeState(1L, EditionState.OPEN));
 
 		assertEquals("EDITION_NOT_FOUND", ex.getError());
 	}
@@ -142,8 +142,8 @@ class EditionLifecycleServiceTest {
 	@Test
 	void assertOperationAllowedShouldRejectTeamRegistrationWhenDraft() {
 		EditionLifecycleException ex = assertThrows(
-				EditionLifecycleException.class,
-				() -> editionLifecycleService.assertOperationAllowed(edition, EditionOperation.TEAM_REGISTRATION));
+			EditionLifecycleException.class,
+			() -> editionLifecycleService.assertOperationAllowed(edition, EditionOperation.TEAM_REGISTRATION));
 
 		assertEquals("EDITION_OPERATION_NOT_ALLOWED", ex.getError());
 	}
@@ -153,8 +153,8 @@ class EditionLifecycleServiceTest {
 		edition.setState(EditionState.CLOSED);
 
 		EditionLifecycleException ex = assertThrows(
-				EditionLifecycleException.class,
-				() -> editionLifecycleService.assertOperationAllowed(edition, EditionOperation.TEAM_REGISTRATION));
+			EditionLifecycleException.class,
+			() -> editionLifecycleService.assertOperationAllowed(edition, EditionOperation.TEAM_REGISTRATION));
 
 		assertEquals("EDITION_OPERATION_NOT_ALLOWED", ex.getError());
 	}
@@ -164,8 +164,8 @@ class EditionLifecycleServiceTest {
 		edition.setState(null);
 
 		EditionLifecycleException ex = assertThrows(
-				EditionLifecycleException.class,
-				() -> editionLifecycleService.assertOperationAllowed(edition, EditionOperation.TEAM_REGISTRATION));
+			EditionLifecycleException.class,
+			() -> editionLifecycleService.assertOperationAllowed(edition, EditionOperation.TEAM_REGISTRATION));
 
 		assertEquals("EDITION_OPERATION_NOT_ALLOWED", ex.getError());
 		assertEquals("Operation TEAM_REGISTRATION is not allowed when edition is in state DRAFT", ex.getMessage());

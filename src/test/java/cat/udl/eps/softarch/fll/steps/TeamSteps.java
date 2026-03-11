@@ -1,12 +1,5 @@
 package cat.udl.eps.softarch.fll.steps;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.util.List;
-import java.util.stream.IntStream;
-import org.springframework.transaction.annotation.Transactional;
 import cat.udl.eps.softarch.fll.domain.Team;
 import cat.udl.eps.softarch.fll.domain.TeamMember;
 import cat.udl.eps.softarch.fll.repository.TeamMemberRepository;
@@ -14,6 +7,14 @@ import cat.udl.eps.softarch.fll.repository.TeamRepository;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.IntStream;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TeamSteps {
 
@@ -40,19 +41,12 @@ public class TeamSteps {
 
 	@Given("I create a team named {string} from {string}")
 	public void iCreateATeam(String name, String city) {
-		currentTeam = new Team(name);
-		currentTeam.setCity(city);
-		currentTeam.setFoundationYear(2000);
-		currentTeam.setCategory("Challenge");
+		currentTeam = Team.create(name, city, 2000, "Challenge");
 	}
 
 	@Given("I add a member named {string} with role {string}")
 	public void iAddAMember(String name, String role) {
-		TeamMember member = new TeamMember();
-		member.setName(name);
-		member.setRole(role);
-		member.setBirthDate(java.time.LocalDate.of(2010, 1, 1));
-		currentTeam.addMember(member);
+		TeamMember.create(name, role, LocalDate.of(2010, 1, 1), currentTeam);
 	}
 
 	@When("I save the team")
@@ -75,10 +69,7 @@ public class TeamSteps {
 	@When("I try to create an invalid team named {string} from {string}")
 	public void tryCreateInvalid(String name, String city) {
 		try {
-			Team team = new Team(name);
-			team.setCity(city);
-			team.setFoundationYear(2000);
-			team.setCategory("Challenge");
+			Team team = Team.create(name, city, 2000, "Challenge");
 			teamRepository.save(team);
 		} catch (Exception e) {
 			lastException = e;
@@ -92,17 +83,10 @@ public class TeamSteps {
 
 	@Given("I have a team named {string} with {int} members")
 	public void createTeamWithManyMembers(String name, int count) {
-		currentTeam = new Team(name);
-		currentTeam.setCity("Igualada");
-		currentTeam.setFoundationYear(2000);
-		currentTeam.setCategory("Challenge");
+		currentTeam = Team.create(name, "Igualada", 2000, "Challenge");
 
 		IntStream.range(0, count).forEach(i -> {
-			TeamMember m = new TeamMember();
-			m.setName("Member " + i);
-			m.setRole("Student");
-			m.setBirthDate(java.time.LocalDate.of(2010, 1, 1));
-			currentTeam.addMember(m);
+			TeamMember.create("Member " + i, "Student", LocalDate.of(2010, 1, 1), currentTeam);
 		});
 		teamRepository.save(currentTeam);
 	}
@@ -112,12 +96,7 @@ public class TeamSteps {
 	public void tryAddExtraMember() {
 		try {
 			Team loadedTeam = teamRepository.findById(currentTeam.getId()).orElseThrow();
-			TeamMember extra = new TeamMember();
-			extra.setName("Extra Member");
-			extra.setRole("Substitute");
-			extra.setBirthDate(java.time.LocalDate.of(2012, 5, 5));
-
-			loadedTeam.addMember(extra);
+			TeamMember.create("Extra Member", "Substitute", LocalDate.of(2012, 5, 5), loadedTeam);
 			teamRepository.save(loadedTeam);
 		} catch (Exception e) {
 			lastException = e;
@@ -137,7 +116,7 @@ public class TeamSteps {
 			current = current.getCause();
 		}
 		assertTrue(found, "Error message '" + expectedMessage + "' not found in exception chain. Got: "
-				+ lastException.getMessage());
+			+ lastException.getMessage());
 	}
 
 	@Given("I have a team {string} with a member {string}")

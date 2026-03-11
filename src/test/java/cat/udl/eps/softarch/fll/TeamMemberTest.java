@@ -1,26 +1,21 @@
 package cat.udl.eps.softarch.fll;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import java.time.LocalDate;
+import cat.udl.eps.softarch.fll.domain.Team;
+import cat.udl.eps.softarch.fll.domain.TeamMember;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import cat.udl.eps.softarch.fll.domain.Team;
-import cat.udl.eps.softarch.fll.domain.TeamMember;
+import java.time.LocalDate;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class TeamMemberTest {
-	private Team team;
 	private TeamMember member;
 
 	@BeforeEach
 	void setUp() {
-		team = new Team("UdL Eagles");
-		member = new TeamMember();
-		member.setName("Joan");
-		member.setBirthDate(LocalDate.of(2005, 5, 20));
-		member.setRole("Developer");
-		member.setTeam(team);
+		Team team = Team.create("UdL Eagles", "Igualada", 2005, "Junior");
+		member = TeamMember.create("Joan", "Developer", LocalDate.of(2005, 5, 20), team);
 	}
 
 	@Test
@@ -41,10 +36,10 @@ class TeamMemberTest {
 	@Test
 	@DisplayName("Compare equality by ID")
 	void testEquals() {
-		TeamMember member1 = new TeamMember();
+		TeamMember member1 = TeamMember.create("Joan", "Developer", LocalDate.of(2005, 5, 20), member.getTeam());
 		member1.setId(1L);
 
-		TeamMember member2 = new TeamMember();
+		TeamMember member2 = TeamMember.create("Pep", "Developer", LocalDate.of(2005, 5, 20), member.getTeam());
 		member2.setId(1L);
 
 		assertEquals(member1, member2, "Two members with the same ID should be equal");

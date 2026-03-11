@@ -1,7 +1,5 @@
 package cat.udl.eps.softarch.fll.domain;
 
-import java.util.HashSet;
-import java.util.Set;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -18,6 +16,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Data
@@ -48,12 +48,27 @@ public class Edition extends UriEntity<Long> {
 
 	@ManyToMany
 	@JoinTable(
-			name = "edition_teams",
-			joinColumns = @JoinColumn(name = "edition_id"),
-			inverseJoinColumns = @JoinColumn(name = "team_name"))
+		name = "edition_teams",
+		joinColumns = @JoinColumn(name = "edition_id"),
+		inverseJoinColumns = @JoinColumn(name = "team_name"))
 	@ToString.Exclude
 	@EqualsAndHashCode.Exclude
 	private Set<Team> teams = new HashSet<>();
+
+	protected Edition() {
+	}
+
+	public static Edition create(Integer year, String venueName, String description) {
+		DomainValidation.requireNonNull(year, "year");
+		DomainValidation.requireNonBlank(venueName, "venueName");
+		DomainValidation.requireNonBlank(description, "description");
+
+		Edition edition = new Edition();
+		edition.year = year;
+		edition.venueName = venueName;
+		edition.description = description;
+		return edition;
+	}
 
 	public boolean hasReachedMaxTeams() {
 		return teams.size() >= MAX_TEAMS;

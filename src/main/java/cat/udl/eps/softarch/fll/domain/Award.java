@@ -50,6 +50,18 @@ public class Award extends UriEntity<Long> {
 	@JsonIdentityReference(alwaysAsId = true)
 	private Team winner;
 
+	public static Award create(String name, Edition edition, Team winner) {
+		DomainValidation.requireNonBlank(name, "name");
+		DomainValidation.requireNonNull(edition, "edition");
+		DomainValidation.requireNonNull(winner, "winner");
+
+		Award award = new Award();
+		award.name = name;
+		award.edition = edition;
+		award.winner = winner;
+		return award;
+	}
+
 	@Override
 	public Long getId() {
 		return this.id;

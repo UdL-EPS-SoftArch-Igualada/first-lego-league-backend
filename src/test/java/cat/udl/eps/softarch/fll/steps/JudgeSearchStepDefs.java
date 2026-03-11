@@ -1,18 +1,18 @@
 package cat.udl.eps.softarch.fll.steps;
 
+import cat.udl.eps.softarch.fll.domain.Judge;
+import cat.udl.eps.softarch.fll.repository.JudgeRepository;
+import com.fasterxml.jackson.databind.JsonNode;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.When;
+import org.springframework.http.MediaType;
+import java.util.UUID;
 import static org.hamcrest.Matchers.hasItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import com.fasterxml.jackson.databind.JsonNode;
-import java.util.UUID;
-import org.springframework.http.MediaType;
-import cat.udl.eps.softarch.fll.domain.Judge;
-import cat.udl.eps.softarch.fll.repository.JudgeRepository;
-import io.cucumber.java.en.And;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.When;
 
 public class JudgeSearchStepDefs {
 
@@ -29,16 +29,10 @@ public class JudgeSearchStepDefs {
 		judgeRepository.deleteAll();
 		String suffix = UUID.randomUUID().toString().substring(0, 8);
 
-		Judge firstJudge = new Judge();
-		firstJudge.setName(firstJudgeName);
-		firstJudge.setEmailAddress("judge.search.first." + suffix + "@example.com");
-		firstJudge.setPhoneNumber("111111111");
+		Judge firstJudge = Judge.create(firstJudgeName, "judge.search.first." + suffix + "@example.com", "111111111");
 		judgeRepository.save(firstJudge);
 
-		Judge secondJudge = new Judge();
-		secondJudge.setName(secondJudgeName);
-		secondJudge.setEmailAddress("judge.search.second." + suffix + "@example.com");
-		secondJudge.setPhoneNumber("222222222");
+		Judge secondJudge = Judge.create(secondJudgeName, "judge.search.second." + suffix + "@example.com", "222222222");
 		judgeRepository.save(secondJudge);
 	}
 
@@ -47,7 +41,7 @@ public class JudgeSearchStepDefs {
 		stepDefs.result = stepDefs.mockMvc.perform(get("/judges/search/findByNameContaining")
 				.param("name", name)
 				.accept(MediaType.APPLICATION_JSON))
-				.andDo(print());
+			.andDo(print());
 	}
 
 	@And("^the judges search response should contain (\\d+) result[s]?$")
