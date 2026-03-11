@@ -1,6 +1,7 @@
 package cat.udl.eps.softarch.fll.repository;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -16,4 +17,6 @@ public interface CoachRepository extends CrudRepository<Coach, Integer>, PagingA
 	@Operation(summary = "Search coaches by name",
 			description = "Returns a list of Coaches whose names contain the specified text.")
 	List<Coach> findByNameContaining(@Param("text") String text);
+
+	Optional<Coach> findByEmailAddress(@Param("email") String email);
 }
