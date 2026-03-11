@@ -1,13 +1,5 @@
 package cat.udl.eps.softarch.fll.steps;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.UUID;
-import org.json.JSONObject;
-import org.springframework.http.MediaType;
 import cat.udl.eps.softarch.fll.domain.Match;
 import cat.udl.eps.softarch.fll.domain.MatchResult;
 import cat.udl.eps.softarch.fll.domain.Team;
@@ -17,6 +9,14 @@ import cat.udl.eps.softarch.fll.repository.TeamRepository;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
+import org.json.JSONObject;
+import org.springframework.http.MediaType;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.UUID;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import io.cucumber.java.en.Then;
 
 public class MatchScoreRegistrationStepDefs {
@@ -30,9 +30,9 @@ public class MatchScoreRegistrationStepDefs {
 	private Team teamB;
 
 	public MatchScoreRegistrationStepDefs(StepDefs stepDefs,
-			TeamRepository teamRepository,
-			MatchRepository matchRepository,
-			MatchResultRepository matchResultRepository) {
+										  TeamRepository teamRepository,
+										  MatchRepository matchRepository,
+										  MatchResultRepository matchResultRepository) {
 		this.stepDefs = stepDefs;
 		this.teamRepository = teamRepository;
 		this.matchRepository = matchRepository;
@@ -59,10 +59,7 @@ public class MatchScoreRegistrationStepDefs {
 
 	@Given("^There is already a registered score for that match$")
 	public void thereIsAlreadyARegisteredScoreForThatMatch() {
-		MatchResult existingResult = new MatchResult();
-		existingResult.setMatch(match);
-		existingResult.setTeam(teamA);
-		existingResult.setScore(100);
+		MatchResult existingResult = MatchResult.create(100, match, teamA);
 		matchResultRepository.save(existingResult);
 	}
 
@@ -98,9 +95,9 @@ public class MatchScoreRegistrationStepDefs {
 	@When("^I register a final score with invalid score format$")
 	public void iRegisterAFinalScoreWithInvalidScoreFormat() throws Throwable {
 		String payload = "{\"matchId\":" + match.getId()
-				+ ",\"score\":{\"teamAId\":\"" + teamA.getId()
-				+ "\",\"teamBId\":\"" + teamB.getId()
-				+ "\",\"teamAScore\":\"invalid\",\"teamBScore\":95}}";
+			+ ",\"score\":{\"teamAId\":\"" + teamA.getId()
+			+ "\",\"teamBId\":\"" + teamB.getId()
+			+ "\",\"teamAScore\":\"invalid\",\"teamBScore\":95}}";
 		postRegisterRawPayload(payload);
 	}
 
@@ -112,19 +109,19 @@ public class MatchScoreRegistrationStepDefs {
 		payload.put("match", "http://localhost/matches/" + match.getId());
 
 		stepDefs.result = stepDefs.mockMvc.perform(post("/matchResults")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(payload.toString())
-				.characterEncoding(StandardCharsets.UTF_8)
-				.accept(MediaType.APPLICATION_JSON)
-					.with(AuthenticationStepDefs.authenticate()));
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(payload.toString())
+			.characterEncoding(StandardCharsets.UTF_8)
+			.accept(MediaType.APPLICATION_JSON)
+			.with(AuthenticationStepDefs.authenticate()));
 	}
 
 	@And("^The register response contains successful flags$")
 	public void theRegisterResponseContainsSuccessfulFlags() throws Throwable {
 		stepDefs.result
-				.andExpect(jsonPath("$.matchId").value(match.getId()))
-					.andExpect(jsonPath("$.resultSaved").value(true))
-					.andExpect(jsonPath("$.rankingUpdated").value(true));
+			.andExpect(jsonPath("$.matchId").value(match.getId()))
+			.andExpect(jsonPath("$.resultSaved").value(true))
+			.andExpect(jsonPath("$.rankingUpdated").value(true));
 	}
 
 	@Then("^The match score error response has code \"([^\"]*)\"$")
@@ -136,7 +133,7 @@ public class MatchScoreRegistrationStepDefs {
 	}
 
 	private void postRegisterScorePayload(Long matchId, String payloadTeamAId, String payloadTeamBId, int payloadTeamAScore, int payloadTeamBScore)
-			throws Throwable {
+		throws Throwable {
 		JSONObject scorePayload = new JSONObject();
 		scorePayload.put("teamAId", payloadTeamAId);
 		scorePayload.put("teamBId", payloadTeamBId);
@@ -151,11 +148,11 @@ public class MatchScoreRegistrationStepDefs {
 
 	private void postRegisterRawPayload(String payload) throws Throwable {
 		stepDefs.result = stepDefs.mockMvc.perform(post("/matchResults/register")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(payload)
-				.characterEncoding(StandardCharsets.UTF_8)
-				.accept(MediaType.APPLICATION_JSON)
-				.with(AuthenticationStepDefs.authenticate()));
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(payload)
+			.characterEncoding(StandardCharsets.UTF_8)
+			.accept(MediaType.APPLICATION_JSON)
+			.with(AuthenticationStepDefs.authenticate()));
 	}
 
 	private void createDefaultTeams() {
@@ -174,11 +171,7 @@ public class MatchScoreRegistrationStepDefs {
 	}
 
 	private Team createTeam(String teamName) {
-		Team team = new Team();
-		team.setName(teamName);
-		team.setCity("Igualada");
-		team.setFoundationYear(2000);
-		team.setCategory("Junior");
+		Team team = Team.create(teamName, "Igualada", 2000, "Junior");
 		team.setEducationalCenter("EPS");
 		team.setInscriptionDate(LocalDate.now());
 		return teamRepository.save(team);

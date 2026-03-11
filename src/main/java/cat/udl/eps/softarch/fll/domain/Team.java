@@ -1,10 +1,6 @@
 package cat.udl.eps.softarch.fll.domain;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,28 +16,27 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @ToString
 @Table(name = "team")
 @NoArgsConstructor(access = lombok.AccessLevel.PUBLIC)
 public class Team extends UriEntity<String> {
-
-	@Override
-	public String getId() {
-		return name;
-	}
 
 	@Id
 	@EqualsAndHashCode.Include
@@ -49,33 +44,67 @@ public class Team extends UriEntity<String> {
 	@Size(min = 3, max = 50, message = "Name must be between 3 and 50 characters")
 	@Column(name = "name", length = 50)
 	private String name;
-
 	@NotBlank(message = "City is mandatory")
 	@Size(max = 100, message = "City name too long")
 	@Column(name = "city", length = 100)
 	private String city;
-
 	@NotNull(message = "Foundation year is mandatory")
 	@Min(value = 1998, message = "Foundation year must be 1998 or later")
 	private Integer foundationYear;
-
 	@Size(max = 100, message = "Educational center name too long")
 	private String educationalCenter;
-
 	@NotBlank(message = "Category is mandatory")
 	private String category;
-
 	@PastOrPresent(message = "Inscription date cannot be in the future")
 	@Column(nullable = false)
 	private LocalDate inscriptionDate;
-
 	@OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Size(max = 10, message = "A team cannot have more than 10 members")
 	@ToString.Exclude
 	private List<TeamMember> members = new ArrayList<>();
+	@ManyToMany
+	@JoinTable(
+		name = "team_edition",
+		joinColumns = @JoinColumn(name = "team_name", referencedColumnName = "name"),
+		inverseJoinColumns = @JoinColumn(name = "edition_id"))
+	@JsonIdentityReference(alwaysAsId = true)
+	@ToString.Exclude
+	private Set<Edition> registeredEditions = new HashSet<>();
+	@ManyToMany
+	@JoinTable(
+		name = "team_coach",
+		joinColumns = @JoinColumn(name = "team_name"),
+		inverseJoinColumns = @JoinColumn(name = "coach_id"))
+	@ToString.Exclude
+	private Set<Coach> trainedBy = new HashSet<>();
+	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@JoinTable(
+		name = "team_floaters",
+		joinColumns = @JoinColumn(name = "team_name"),
+		inverseJoinColumns = @JoinColumn(name = "floater_id"))
+	@ToString.Exclude
+	private Set<Floater> floaters = new HashSet<>();
 
-	public Team(String name) {
-		this.name = name;
+	public static Team create(String name, String city, Integer foundationYear, String category) {
+		DomainValidation.requireNonBlank(name, "name");
+		DomainValidation.requireLengthBetween(name, 3, 50, "name");
+		DomainValidation.requireNonBlank(city, "city");
+		DomainValidation.requireLengthBetween(city, 1, 100, "city");
+		DomainValidation.requireMin(foundationYear, 1998, "foundationYear");
+		DomainValidation.requireNonBlank(category, "category");
+
+		Team team = new Team();
+		team.name = name;
+		team.city = city;
+		team.foundationYear = foundationYear;
+		team.category = category;
+		team.inscriptionDate = LocalDate.now();
+		return team;
+	}
+
+	@Override
+	public String getId() {
+		return name;
 	}
 
 	@PrePersist
@@ -92,33 +121,6 @@ public class Team extends UriEntity<String> {
 		members.add(member);
 		member.setTeam(this);
 	}
-
-	@ManyToMany
-	@JoinTable(
-			name = "team_edition",
-			joinColumns = @JoinColumn(name = "team_name", referencedColumnName = "name"),
-			inverseJoinColumns = @JoinColumn(name = "edition_id"))
-	@JsonIdentityReference(alwaysAsId = true)
-	@ToString.Exclude
-	private Set<Edition> registeredEditions = new HashSet<>();
-
-	@ManyToMany
-	@JoinTable(
-			name = "team_coach",
-			joinColumns = @JoinColumn(name = "team_name"),
-			inverseJoinColumns = @JoinColumn(name = "coach_id"))
-	@ToString.Exclude
-	private Set<Coach> trainedBy = new HashSet<>();
-
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(
-			name = "team_floaters",
-			joinColumns = @JoinColumn(name = "team_name"),
-			inverseJoinColumns = @JoinColumn(name = "floater_id"))
-	@ToString.Exclude
-	private Set<Floater> floaters = new HashSet<>();
-
-
 
 	public void addFloater(Floater floater) {
 		if (floaters.contains(floater)) {

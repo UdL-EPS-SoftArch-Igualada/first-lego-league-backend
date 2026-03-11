@@ -1,20 +1,5 @@
 package cat.udl.eps.softarch.fll.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import cat.udl.eps.softarch.fll.controller.dto.BatchMatchAssignmentItemRequest;
 import cat.udl.eps.softarch.fll.controller.dto.BatchMatchAssignmentResponse;
 import cat.udl.eps.softarch.fll.domain.Floater;
@@ -27,6 +12,21 @@ import cat.udl.eps.softarch.fll.exception.MatchAssignmentException;
 import cat.udl.eps.softarch.fll.repository.MatchRepository;
 import cat.udl.eps.softarch.fll.repository.RoundRepository;
 import cat.udl.eps.softarch.fll.repository.VolunteerRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MatchAssignmentServiceTest {
@@ -53,7 +53,7 @@ class MatchAssignmentServiceTest {
 		when(matchRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(match));
 		when(volunteerRepository.findByIdForUpdate(20L)).thenReturn(Optional.of(referee));
 		when(matchRepository.findOverlappingAssignments(
-				referee, match.getStartTime(), match.getEndTime(), match.getId())).thenReturn(List.of());
+			referee, match.getStartTime(), match.getEndTime(), match.getId())).thenReturn(List.of());
 		when(matchRepository.save(any(Match.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
 		Match result = service.assignReferee("10", "20");
@@ -67,7 +67,7 @@ class MatchAssignmentServiceTest {
 		when(matchRepository.findByIdForUpdate(10L)).thenReturn(Optional.empty());
 
 		MatchAssignmentException ex = assertThrows(
-				MatchAssignmentException.class, () -> service.assignReferee("10", "20"));
+			MatchAssignmentException.class, () -> service.assignReferee("10", "20"));
 
 		assertEquals(MatchAssignmentErrorCode.MATCH_NOT_FOUND, ex.getErrorCode());
 	}
@@ -79,7 +79,7 @@ class MatchAssignmentServiceTest {
 		when(volunteerRepository.findByIdForUpdate(20L)).thenReturn(Optional.empty());
 
 		MatchAssignmentException ex = assertThrows(
-				MatchAssignmentException.class, () -> service.assignReferee("10", "20"));
+			MatchAssignmentException.class, () -> service.assignReferee("10", "20"));
 
 		assertEquals(MatchAssignmentErrorCode.REFEREE_NOT_FOUND, ex.getErrorCode());
 	}
@@ -87,14 +87,14 @@ class MatchAssignmentServiceTest {
 	@Test
 	void assignRefereeFailsWhenVolunteerIsNotReferee() {
 		Match match = buildMatch(10L, MatchState.SCHEDULED, null);
-		Floater floater = new Floater();
+		Floater floater = Floater.create("Name", "mail@mail.com", "123456789", "STU123");
 		floater.setId(20L);
 
 		when(matchRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(match));
 		when(volunteerRepository.findByIdForUpdate(20L)).thenReturn(Optional.of(floater));
 
 		MatchAssignmentException ex = assertThrows(
-				MatchAssignmentException.class, () -> service.assignReferee("10", "20"));
+			MatchAssignmentException.class, () -> service.assignReferee("10", "20"));
 
 		assertEquals(MatchAssignmentErrorCode.INVALID_ROLE, ex.getErrorCode());
 	}
@@ -108,10 +108,10 @@ class MatchAssignmentServiceTest {
 		when(matchRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(match));
 		when(volunteerRepository.findByIdForUpdate(20L)).thenReturn(Optional.of(referee));
 		when(matchRepository.findOverlappingAssignments(
-				referee, match.getStartTime(), match.getEndTime(), match.getId())).thenReturn(List.of(overlapping));
+			referee, match.getStartTime(), match.getEndTime(), match.getId())).thenReturn(List.of(overlapping));
 
 		MatchAssignmentException ex = assertThrows(
-				MatchAssignmentException.class, () -> service.assignReferee("10", "20"));
+			MatchAssignmentException.class, () -> service.assignReferee("10", "20"));
 
 		assertEquals(MatchAssignmentErrorCode.AVAILABILITY_CONFLICT, ex.getErrorCode());
 	}
@@ -124,7 +124,7 @@ class MatchAssignmentServiceTest {
 		when(matchRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(match));
 
 		MatchAssignmentException ex = assertThrows(
-				MatchAssignmentException.class, () -> service.assignReferee("10", "20"));
+			MatchAssignmentException.class, () -> service.assignReferee("10", "20"));
 
 		assertEquals(MatchAssignmentErrorCode.MATCH_ALREADY_HAS_REFEREE, ex.getErrorCode());
 	}
@@ -135,7 +135,7 @@ class MatchAssignmentServiceTest {
 		when(matchRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(match));
 
 		MatchAssignmentException ex = assertThrows(
-				MatchAssignmentException.class, () -> service.assignReferee("10", "20"));
+			MatchAssignmentException.class, () -> service.assignReferee("10", "20"));
 
 		assertEquals(MatchAssignmentErrorCode.INVALID_MATCH_STATE, ex.getErrorCode());
 	}
@@ -143,7 +143,7 @@ class MatchAssignmentServiceTest {
 	@Test
 	void assignRefereeFailsWhenMatchIdIsInvalidFormat() {
 		MatchAssignmentException ex = assertThrows(
-				MatchAssignmentException.class, () -> service.assignReferee("abc", "20"));
+			MatchAssignmentException.class, () -> service.assignReferee("abc", "20"));
 
 		assertEquals(MatchAssignmentErrorCode.INVALID_ID_FORMAT, ex.getErrorCode());
 	}
@@ -168,13 +168,13 @@ class MatchAssignmentServiceTest {
 		when(volunteerRepository.findByIdForUpdate(20L)).thenReturn(Optional.of(refereeA));
 		when(volunteerRepository.findByIdForUpdate(21L)).thenReturn(Optional.of(refereeB));
 		when(matchRepository.findOverlappingAssignments(refereeA, matchA.getStartTime(), matchA.getEndTime(), 10L))
-				.thenReturn(List.of());
+			.thenReturn(List.of());
 		when(matchRepository.findOverlappingAssignments(refereeB, matchB.getStartTime(), matchB.getEndTime(), 11L))
-				.thenReturn(List.of());
+			.thenReturn(List.of());
 
 		BatchMatchAssignmentResponse response = service.assignBatch("3", List.of(
-				new BatchMatchAssignmentItemRequest("10", "20"),
-				new BatchMatchAssignmentItemRequest("11", "21")));
+			new BatchMatchAssignmentItemRequest("10", "20"),
+			new BatchMatchAssignmentItemRequest("11", "21")));
 
 		assertEquals("3", response.roundId());
 		assertEquals("ASSIGNED", response.status());
@@ -203,16 +203,16 @@ class MatchAssignmentServiceTest {
 		when(matchRepository.findByIdForUpdate(11L)).thenReturn(Optional.of(matchB));
 		when(volunteerRepository.findByIdForUpdate(20L)).thenReturn(Optional.of(referee));
 		when(matchRepository.findOverlappingAssignments(referee, matchA.getStartTime(), matchA.getEndTime(), 10L))
-				.thenReturn(List.of());
+			.thenReturn(List.of());
 		when(matchRepository.findOverlappingAssignments(referee, matchB.getStartTime(), matchB.getEndTime(), 11L))
-				.thenReturn(List.of());
+			.thenReturn(List.of());
 		List<BatchMatchAssignmentItemRequest> assignments = List.of(
-				new BatchMatchAssignmentItemRequest("10", "20"),
-				new BatchMatchAssignmentItemRequest("11", "20"));
+			new BatchMatchAssignmentItemRequest("10", "20"),
+			new BatchMatchAssignmentItemRequest("11", "20"));
 
 		MatchAssignmentException ex = assertThrows(
-				MatchAssignmentException.class,
-				() -> service.assignBatch("3", assignments));
+			MatchAssignmentException.class,
+			() -> service.assignBatch("3", assignments));
 
 		assertEquals(MatchAssignmentErrorCode.AVAILABILITY_CONFLICT, ex.getErrorCode());
 		assertEquals(1, ex.getIndex());
@@ -227,7 +227,7 @@ class MatchAssignmentServiceTest {
 		Match matchB = buildMatch(11L, MatchState.SCHEDULED, null);
 		matchB.setRound(round);
 		Referee referee = buildReferee(20L);
-		Floater floater = new Floater();
+		Floater floater = Floater.create("name", "email@email.com", "123456789", "STU123");
 		floater.setId(21L);
 
 		when(roundRepository.findById(3L)).thenReturn(Optional.of(round));
@@ -236,14 +236,14 @@ class MatchAssignmentServiceTest {
 		when(volunteerRepository.findByIdForUpdate(20L)).thenReturn(Optional.of(referee));
 		when(volunteerRepository.findByIdForUpdate(21L)).thenReturn(Optional.of(floater));
 		when(matchRepository.findOverlappingAssignments(referee, matchA.getStartTime(), matchA.getEndTime(), 10L))
-				.thenReturn(List.of());
+			.thenReturn(List.of());
 		List<BatchMatchAssignmentItemRequest> assignments = List.of(
-				new BatchMatchAssignmentItemRequest("10", "20"),
-				new BatchMatchAssignmentItemRequest("11", "21"));
+			new BatchMatchAssignmentItemRequest("10", "20"),
+			new BatchMatchAssignmentItemRequest("11", "21"));
 
 		MatchAssignmentException ex = assertThrows(
-				MatchAssignmentException.class,
-				() -> service.assignBatch("3", assignments));
+			MatchAssignmentException.class,
+			() -> service.assignBatch("3", assignments));
 
 		assertEquals(MatchAssignmentErrorCode.INVALID_ROLE, ex.getErrorCode());
 		assertEquals(1, ex.getIndex());
@@ -254,11 +254,11 @@ class MatchAssignmentServiceTest {
 	void assignBatchFailsWhenItemIdFormatIsInvalid() {
 		when(roundRepository.findById(3L)).thenReturn(Optional.of(buildRound(3L)));
 		List<BatchMatchAssignmentItemRequest> assignments = List.of(
-				new BatchMatchAssignmentItemRequest("not-a-number", "20"));
+			new BatchMatchAssignmentItemRequest("not-a-number", "20"));
 
 		MatchAssignmentException ex = assertThrows(
-				MatchAssignmentException.class,
-				() -> service.assignBatch("3", assignments));
+			MatchAssignmentException.class,
+			() -> service.assignBatch("3", assignments));
 
 		assertEquals(MatchAssignmentErrorCode.INVALID_ID_FORMAT, ex.getErrorCode());
 		assertEquals(0, ex.getIndex());
@@ -269,12 +269,12 @@ class MatchAssignmentServiceTest {
 	void assignBatchFailsWhenMatchIdAppearsTwiceInPayload() {
 		when(roundRepository.findById(3L)).thenReturn(Optional.of(buildRound(3L)));
 		List<BatchMatchAssignmentItemRequest> assignments = List.of(
-				new BatchMatchAssignmentItemRequest("10", "20"),
-				new BatchMatchAssignmentItemRequest("10", "21"));
+			new BatchMatchAssignmentItemRequest("10", "20"),
+			new BatchMatchAssignmentItemRequest("10", "21"));
 
 		MatchAssignmentException ex = assertThrows(
-				MatchAssignmentException.class,
-				() -> service.assignBatch("3", assignments));
+			MatchAssignmentException.class,
+			() -> service.assignBatch("3", assignments));
 
 		assertEquals(MatchAssignmentErrorCode.DUPLICATE_MATCH_IN_BATCH, ex.getErrorCode());
 		assertEquals(1, ex.getIndex());
@@ -285,11 +285,11 @@ class MatchAssignmentServiceTest {
 	void assignBatchFailsWhenRoundDoesNotExist() {
 		when(roundRepository.findById(3L)).thenReturn(Optional.empty());
 		List<BatchMatchAssignmentItemRequest> assignments = List.of(
-				new BatchMatchAssignmentItemRequest("10", "20"));
+			new BatchMatchAssignmentItemRequest("10", "20"));
 
 		MatchAssignmentException ex = assertThrows(
-				MatchAssignmentException.class,
-				() -> service.assignBatch("3", assignments));
+			MatchAssignmentException.class,
+			() -> service.assignBatch("3", assignments));
 
 		assertEquals(MatchAssignmentErrorCode.ROUND_NOT_FOUND, ex.getErrorCode());
 		verify(matchRepository, never()).saveAll(any());
@@ -306,7 +306,7 @@ class MatchAssignmentServiceTest {
 	}
 
 	private Referee buildReferee(Long id) {
-		Referee referee = new Referee();
+		Referee referee = Referee.create("Referee" + id, "referee" + id + "@mail.com", "123456789");
 		referee.setId(id);
 		return referee;
 	}

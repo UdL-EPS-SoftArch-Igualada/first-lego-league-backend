@@ -1,21 +1,5 @@
 package cat.udl.eps.softarch.fll.steps;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.stream.IntStream;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.transaction.annotation.Transactional;
 import cat.udl.eps.softarch.fll.domain.Edition;
 import cat.udl.eps.softarch.fll.domain.EditionState;
 import cat.udl.eps.softarch.fll.domain.Team;
@@ -25,6 +9,22 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.stream.IntStream;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 public class TeamEditionRegistrationStepDefs {
 
@@ -36,9 +36,9 @@ public class TeamEditionRegistrationStepDefs {
 	private List<Integer> concurrentResponseCodes;
 
 	public TeamEditionRegistrationStepDefs(StepDefs stepDefs,
-			ManageEditionStepDefs manageEditionStepDefs,
-			EditionRepository editionRepository,
-			TeamRepository teamRepository) {
+										   ManageEditionStepDefs manageEditionStepDefs,
+										   EditionRepository editionRepository,
+										   TeamRepository teamRepository) {
 		this.stepDefs = stepDefs;
 		this.manageEditionStepDefs = manageEditionStepDefs;
 		this.editionRepository = editionRepository;
@@ -48,10 +48,7 @@ public class TeamEditionRegistrationStepDefs {
 	@Given("There is a team named {string} from {string} with category {string}")
 	public void thereIsATeam(String name, String city, String category) {
 		if (!teamRepository.existsById(name)) {
-			Team team = new Team(name);
-			team.setCity(city);
-			team.setFoundationYear(2000);
-			team.setCategory(category);
+			Team team = Team.create(name, city, 2000, category);
 			teamRepository.save(team);
 		}
 	}
@@ -72,10 +69,7 @@ public class TeamEditionRegistrationStepDefs {
 		IntStream.range(0, count).forEach(i -> {
 			String teamName = "FillerTeam_" + edition.getId() + "_" + i;
 			Team team = teamRepository.findById(teamName).orElseGet(() -> {
-				Team created = new Team(teamName);
-				created.setCity("Igualada");
-				created.setFoundationYear(2000);
-				created.setCategory("Challenge");
+				Team created = Team.create(teamName, "Igualada", 2000, "Challenge");
 				return teamRepository.save(created);
 			});
 			edition.getTeams().add(team);
@@ -95,18 +89,18 @@ public class TeamEditionRegistrationStepDefs {
 	public void iRegisterTeamToCurrentEdition(String teamName) throws Exception {
 		stepDefs.result = stepDefs.mockMvc.perform(
 				post("/editions/" + currentEditionId() + "/teams/" + teamName)
-						.accept(MediaType.APPLICATION_JSON)
-						.with(AuthenticationStepDefs.authenticate()))
-				.andDo(print());
+					.accept(MediaType.APPLICATION_JSON)
+					.with(AuthenticationStepDefs.authenticate()))
+			.andDo(print());
 	}
 
 	@When("I register team {string} to edition with id {long}")
 	public void iRegisterTeamToEditionById(String teamName, Long editionId) throws Exception {
 		stepDefs.result = stepDefs.mockMvc.perform(
 				post("/editions/" + editionId + "/teams/" + teamName)
-						.accept(MediaType.APPLICATION_JSON)
-						.with(AuthenticationStepDefs.authenticate()))
-				.andDo(print());
+					.accept(MediaType.APPLICATION_JSON)
+					.with(AuthenticationStepDefs.authenticate()))
+			.andDo(print());
 	}
 
 	@When("I register teams {string} and {string} concurrently to the current edition")
@@ -154,13 +148,13 @@ public class TeamEditionRegistrationStepDefs {
 	}
 
 	private int performRegistration(MockMvc mockMvc, Long editionId, String teamName,
-			CyclicBarrier barrier) throws Exception {
+									CyclicBarrier barrier) throws Exception {
 		barrier.await();
 		MvcResult result = mockMvc.perform(
 				post("/editions/" + editionId + "/teams/" + teamName)
-						.accept(MediaType.APPLICATION_JSON)
-						.with(AuthenticationStepDefs.authenticate()))
-				.andReturn();
+					.accept(MediaType.APPLICATION_JSON)
+					.with(AuthenticationStepDefs.authenticate()))
+			.andReturn();
 		return result.getResponse().getStatus();
 	}
 }

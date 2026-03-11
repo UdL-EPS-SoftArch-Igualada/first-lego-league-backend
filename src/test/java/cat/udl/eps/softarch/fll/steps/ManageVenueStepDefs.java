@@ -1,5 +1,13 @@
 package cat.udl.eps.softarch.fll.steps;
 
+import cat.udl.eps.softarch.fll.domain.Venue;
+import cat.udl.eps.softarch.fll.repository.VenueRepository;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.When;
+import org.springframework.http.MediaType;
+import java.nio.charset.StandardCharsets;
+import java.util.NoSuchElementException;
 import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
@@ -13,15 +21,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.NoSuchElementException;
-import org.springframework.http.MediaType;
-import cat.udl.eps.softarch.fll.domain.Venue;
-import cat.udl.eps.softarch.fll.repository.VenueRepository;
-import io.cucumber.java.en.And;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.When;
 
 public class ManageVenueStepDefs {
 	private final StepDefs stepDefs;
@@ -39,26 +39,22 @@ public class ManageVenueStepDefs {
 
 	@Given("^There is a venue with name \"([^\"]*)\" and city \"([^\"]*)\"$")
 	public void thereIsAVenueWithNameAndCity(String name, String city) {
-		Venue venue = new Venue();
-		venue.setName(name);
-		venue.setCity(city);
+		Venue venue = Venue.create(name, city);
 		venueRepository.save(venue);
 	}
 
 	@When("^I create a new venue with name \"([^\"]*)\" and city \"([^\"]*)\"$")
 	public void iCreateANewVenueWithNameAndCity(String name, String city) throws Throwable {
-		Venue venue = new Venue();
-		venue.setName(name);
-		venue.setCity(city);
+		Venue venue = Venue.create(name, city);
 
 		stepDefs.result = stepDefs.mockMvc.perform(
 				post("/venues")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(stepDefs.mapper.writeValueAsString(venue))
-						.characterEncoding(StandardCharsets.UTF_8)
-						.accept(MediaType.APPLICATION_JSON)
-						.with(AuthenticationStepDefs.authenticate()))
-				.andDo(print());
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(stepDefs.mapper.writeValueAsString(venue))
+					.characterEncoding(StandardCharsets.UTF_8)
+					.accept(MediaType.APPLICATION_JSON)
+					.with(AuthenticationStepDefs.authenticate()))
+			.andDo(print());
 	}
 
 	@When("^I retrieve the venue with name \"([^\"]*)\"$")
@@ -66,27 +62,25 @@ public class ManageVenueStepDefs {
 		Venue venue = findVenueByName(name);
 		stepDefs.result = stepDefs.mockMvc.perform(
 				get("/venues/{id}", venue.getId())
-						.accept(MediaType.APPLICATION_JSON)
-						.characterEncoding(StandardCharsets.UTF_8)
-						.with(AuthenticationStepDefs.authenticate()))
-				.andDo(print());
+					.accept(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8)
+					.with(AuthenticationStepDefs.authenticate()))
+			.andDo(print());
 	}
 
 	@When("^I update the venue with name \"([^\"]*)\" to city \"([^\"]*)\"$")
 	public void iUpdateTheVenueWithNameToCity(String name, String newCity) throws Throwable {
 		Venue existingVenue = findVenueByName(name);
-		Venue venue = new Venue();
-		venue.setName(name);
-		venue.setCity(newCity);
+		Venue venue = Venue.create(name, newCity);
 
 		stepDefs.result = stepDefs.mockMvc.perform(
 				put("/venues/{id}", existingVenue.getId())
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(stepDefs.mapper.writeValueAsString(venue))
-						.characterEncoding(StandardCharsets.UTF_8)
-						.accept(MediaType.APPLICATION_JSON)
-						.with(AuthenticationStepDefs.authenticate()))
-				.andDo(print());
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(stepDefs.mapper.writeValueAsString(venue))
+					.characterEncoding(StandardCharsets.UTF_8)
+					.accept(MediaType.APPLICATION_JSON)
+					.with(AuthenticationStepDefs.authenticate()))
+			.andDo(print());
 	}
 
 	@When("^I delete the venue with name \"([^\"]*)\"$")
@@ -94,8 +88,8 @@ public class ManageVenueStepDefs {
 		Venue venue = findVenueByName(name);
 		stepDefs.result = stepDefs.mockMvc.perform(
 				delete("/venues/{id}", venue.getId())
-						.with(AuthenticationStepDefs.authenticate()))
-				.andDo(print());
+					.with(AuthenticationStepDefs.authenticate()))
+			.andDo(print());
 	}
 
 	@And("^A venue with name \"([^\"]*)\" and city \"([^\"]*)\" exists$")
@@ -107,8 +101,8 @@ public class ManageVenueStepDefs {
 	@And("^The response contains venue name \"([^\"]*)\" and city \"([^\"]*)\"$")
 	public void theResponseContainsVenueNameAndCity(String name, String city) throws Throwable {
 		stepDefs.result
-				.andExpect(jsonPath("$.name", is(name)))
-				.andExpect(jsonPath("$.city", is(city)));
+			.andExpect(jsonPath("$.name", is(name)))
+			.andExpect(jsonPath("$.city", is(city)));
 	}
 
 	@And("^The venue with name \"([^\"]*)\" has city \"([^\"]*)\"$")
@@ -157,6 +151,6 @@ public class ManageVenueStepDefs {
 
 	private Venue findVenueByName(String name) {
 		return venueRepository.findByName(name)
-				.orElseThrow(() -> new NoSuchElementException("Venue not found with name: " + name));
+			.orElseThrow(() -> new NoSuchElementException("Venue not found with name: " + name));
 	}
 }

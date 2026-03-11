@@ -1,5 +1,18 @@
 package cat.udl.eps.softarch.fll.steps;
 
+import cat.udl.eps.softarch.fll.domain.Team;
+import cat.udl.eps.softarch.fll.repository.TeamMemberRepository;
+import cat.udl.eps.softarch.fll.repository.TeamRepository;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
+import org.json.JSONObject;
+import org.springframework.http.MediaType;
+import org.springframework.web.util.UriUtils;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -8,19 +21,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import org.json.JSONObject;
-import org.springframework.http.MediaType;
-import org.springframework.web.util.UriUtils;
-import cat.udl.eps.softarch.fll.domain.Team;
-import cat.udl.eps.softarch.fll.repository.TeamMemberRepository;
-import cat.udl.eps.softarch.fll.repository.TeamRepository;
-import io.cucumber.java.en.And;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
 
 public class TeamMemberStepDefs {
 
@@ -51,10 +51,7 @@ public class TeamMemberStepDefs {
 		if (teamRepository.existsById(teamName)) {
 			return;
 		}
-		Team team = new Team(teamName);
-		team.setCity("Igualada");
-		team.setFoundationYear(2005);
-		team.setCategory("Challenge");
+		Team team = Team.create(teamName, "Igualada", 2005, "Challenge");
 		teamRepository.save(team);
 	}
 
@@ -64,12 +61,12 @@ public class TeamMemberStepDefs {
 
 		stepDefs.result = stepDefs.mockMvc.perform(
 				post("/teamMembers")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(payload.toString())
-						.characterEncoding(StandardCharsets.UTF_8)
-						.accept(MediaType.APPLICATION_JSON)
-						.with(AuthenticationStepDefs.authenticate()))
-				.andDo(print());
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(payload.toString())
+					.characterEncoding(StandardCharsets.UTF_8)
+					.accept(MediaType.APPLICATION_JSON)
+					.with(AuthenticationStepDefs.authenticate()))
+			.andDo(print());
 
 		captureLatestTeamMemberIfCreated();
 	}
@@ -77,17 +74,17 @@ public class TeamMemberStepDefs {
 	@When("I try to create a team member missing {string} for team {string}")
 	public void iTryToCreateATeamMemberMissingField(String field, String teamName) throws Exception {
 		JSONObject payload =
-				buildTeamMemberPayload("Valid Name", LocalDate.of(2010, 1, 1).toString(), "Builder", teamName);
+			buildTeamMemberPayload("Valid Name", LocalDate.of(2010, 1, 1).toString(), "Builder", teamName);
 		payload.remove(field);
 
 		stepDefs.result = stepDefs.mockMvc.perform(
 				post("/teamMembers")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(payload.toString())
-						.characterEncoding(StandardCharsets.UTF_8)
-						.accept(MediaType.APPLICATION_JSON)
-						.with(AuthenticationStepDefs.authenticate()))
-				.andDo(print());
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(payload.toString())
+					.characterEncoding(StandardCharsets.UTF_8)
+					.accept(MediaType.APPLICATION_JSON)
+					.with(AuthenticationStepDefs.authenticate()))
+			.andDo(print());
 	}
 
 	@When("I retrieve the created team member by id")
@@ -95,20 +92,20 @@ public class TeamMemberStepDefs {
 		assertLatestTeamMemberIdPresent();
 		stepDefs.result = stepDefs.mockMvc.perform(
 				get("/teamMembers/{id}", latestTeamMemberId)
-						.accept(MediaType.APPLICATION_JSON)
-						.characterEncoding(StandardCharsets.UTF_8)
-						.with(AuthenticationStepDefs.authenticate()))
-				.andDo(print());
+					.accept(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8)
+					.with(AuthenticationStepDefs.authenticate()))
+			.andDo(print());
 	}
 
 	@When("I list all team members")
 	public void iListAllTeamMembers() throws Exception {
 		stepDefs.result = stepDefs.mockMvc.perform(
 				get("/teamMembers")
-						.accept(MediaType.APPLICATION_JSON)
-						.characterEncoding(StandardCharsets.UTF_8)
-						.with(AuthenticationStepDefs.authenticate()))
-				.andDo(print());
+					.accept(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8)
+					.with(AuthenticationStepDefs.authenticate()))
+			.andDo(print());
 	}
 
 	@When("I delete the created team member")
@@ -116,8 +113,8 @@ public class TeamMemberStepDefs {
 		assertLatestTeamMemberIdPresent();
 		stepDefs.result = stepDefs.mockMvc.perform(
 				delete("/teamMembers/{id}", latestTeamMemberId)
-						.with(AuthenticationStepDefs.authenticate()))
-				.andDo(print());
+					.with(AuthenticationStepDefs.authenticate()))
+			.andDo(print());
 	}
 
 	@When("I retrieve the deleted team member by id")
@@ -130,13 +127,13 @@ public class TeamMemberStepDefs {
 		assertLatestTeamMemberUriPresent();
 		stepDefs.mockMvc.perform(
 				get(pathFromAbsoluteUri(latestTeamMemberUri))
-						.accept(MediaType.APPLICATION_JSON)
-						.characterEncoding(StandardCharsets.UTF_8)
-						.with(AuthenticationStepDefs.authenticate()))
-				.andDo(print())
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.name", is(expectedName)))
-				.andExpect(jsonPath("$.role", is(expectedRole)));
+					.accept(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8)
+					.with(AuthenticationStepDefs.authenticate()))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.name", is(expectedName)))
+			.andExpect(jsonPath("$.role", is(expectedRole)));
 	}
 
 	@Then("The created team member is linked to team {string}")
@@ -144,19 +141,19 @@ public class TeamMemberStepDefs {
 		assertLatestTeamMemberUriPresent();
 		stepDefs.mockMvc.perform(
 				get(pathFromAbsoluteUri(latestTeamMemberUri) + "/team")
-						.accept(MediaType.APPLICATION_JSON)
-						.characterEncoding(StandardCharsets.UTF_8)
-						.with(AuthenticationStepDefs.authenticate()))
-				.andDo(print())
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id", is(expectedTeamName)));
+					.accept(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8)
+					.with(AuthenticationStepDefs.authenticate()))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.id", is(expectedTeamName)));
 	}
 
 	@Then("The response contains team member name {string} and role {string}")
 	public void theResponseContainsTeamMemberNameAndRole(String expectedName, String expectedRole) throws Exception {
 		stepDefs.result
-				.andExpect(jsonPath("$.name", is(expectedName)))
-				.andExpect(jsonPath("$.role", is(expectedRole)));
+			.andExpect(jsonPath("$.name", is(expectedName)))
+			.andExpect(jsonPath("$.role", is(expectedRole)));
 	}
 
 	@And("The team member list contains name {string}")
@@ -194,7 +191,7 @@ public class TeamMemberStepDefs {
 			latestTeamMemberId = Long.valueOf(idToken);
 		} catch (NumberFormatException e) {
 			throw new IllegalStateException(
-					"Could not parse team member ID from Location header: " + latestTeamMemberUri, e);
+				"Could not parse team member ID from Location header: " + latestTeamMemberUri, e);
 		}
 	}
 

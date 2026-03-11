@@ -1,7 +1,5 @@
 package cat.udl.eps.softarch.fll.domain;
 
-import java.time.ZonedDateTime;
-import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,6 +9,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.format.annotation.DateTimeFormat;
+import java.time.ZonedDateTime;
 
 @Entity
 @Data
@@ -36,4 +36,11 @@ public class Record extends UriEntity<Long> {
 	@JsonIdentityReference(alwaysAsId = true)
 	private User owner;
 
+	public static Record create(String name) {
+		DomainValidation.requireNonBlank(name, "name");
+
+		Record newRecord = new Record();
+		newRecord.name = name;
+		return newRecord;
+	}
 }

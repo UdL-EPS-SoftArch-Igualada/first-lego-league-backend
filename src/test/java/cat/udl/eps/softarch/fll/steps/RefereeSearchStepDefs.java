@@ -1,18 +1,18 @@
 package cat.udl.eps.softarch.fll.steps;
 
+import cat.udl.eps.softarch.fll.domain.Referee;
+import cat.udl.eps.softarch.fll.repository.RefereeRepository;
+import com.fasterxml.jackson.databind.JsonNode;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.When;
+import org.springframework.http.MediaType;
+import java.util.UUID;
 import static org.hamcrest.Matchers.hasItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import com.fasterxml.jackson.databind.JsonNode;
-import java.util.UUID;
-import org.springframework.http.MediaType;
-import cat.udl.eps.softarch.fll.domain.Referee;
-import cat.udl.eps.softarch.fll.repository.RefereeRepository;
-import io.cucumber.java.en.And;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.When;
 
 public class RefereeSearchStepDefs {
 
@@ -29,16 +29,10 @@ public class RefereeSearchStepDefs {
 		refereeRepository.deleteAll();
 		String suffix = UUID.randomUUID().toString().substring(0, 8);
 
-		Referee firstReferee = new Referee();
-		firstReferee.setName(firstRefereeName);
-		firstReferee.setEmailAddress("referee.search.first." + suffix + "@example.com");
-		firstReferee.setPhoneNumber("333333333");
+		Referee firstReferee = Referee.create(firstRefereeName, "referee.search.first." + suffix + "@example.com", "333333333");
 		refereeRepository.save(firstReferee);
 
-		Referee secondReferee = new Referee();
-		secondReferee.setName(secondRefereeName);
-		secondReferee.setEmailAddress("referee.search.second." + suffix + "@example.com");
-		secondReferee.setPhoneNumber("444444444");
+		Referee secondReferee = Referee.create(secondRefereeName, "referee.search.second." + suffix + "@example.com", "444444444");
 		refereeRepository.save(secondReferee);
 	}
 
@@ -47,7 +41,7 @@ public class RefereeSearchStepDefs {
 		stepDefs.result = stepDefs.mockMvc.perform(get("/referees/search/findByNameContaining")
 				.param("name", name)
 				.accept(MediaType.APPLICATION_JSON))
-				.andDo(print());
+			.andDo(print());
 	}
 
 	@And("^the referees search response should contain (\\d+) result[s]?$")
