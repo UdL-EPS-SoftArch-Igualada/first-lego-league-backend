@@ -26,12 +26,12 @@ public interface MatchRepository extends
 	JpaSpecificationExecutor<Match> {
 
 	@Query("""
-			SELECT m FROM Match m
-			WHERE m.referee = :referee
-			AND m.startTime < :newMatchEndTime
-			AND m.endTime > :newMatchStartTime
-			AND m.id <> :currentMatchId
-			""")
+            SELECT m FROM Match m
+            WHERE m.referee = :referee
+            AND m.startTime < :newMatchEndTime
+            AND m.endTime > :newMatchStartTime
+            AND m.id <> :currentMatchId
+            """)
 	List<Match> findOverlappingAssignments(
 		@Param("referee") Referee referee,
 		@Param("newMatchStartTime") LocalTime newMatchStartTime,
@@ -39,12 +39,12 @@ public interface MatchRepository extends
 		@Param("currentMatchId") Long currentMatchId);
 
 	@Query("""
-			SELECT COUNT(m) > 0 FROM Match m
-			WHERE m.competitionTable = :table
-			AND m.startTime < :newMatchEndTime
-			AND m.endTime > :newMatchStartTime
-			AND (:currentMatchId IS NULL OR m.id <> :currentMatchId)
-			""")
+            SELECT COUNT(m) > 0 FROM Match m
+            WHERE m.competitionTable = :table
+            AND m.startTime < :newMatchEndTime
+            AND m.endTime > :newMatchStartTime
+            AND (:currentMatchId IS NULL OR m.id <> :currentMatchId)
+            """)
 	@RestResource(exported = false)
 	boolean existsOverlappingAssignmentsForTable(
 		@Param("table") CompetitionTable table,
@@ -58,12 +58,12 @@ public interface MatchRepository extends
 	Optional<Match> findByIdForUpdate(@Param("id") Long id);
 
 	@Query("""
-			SELECT m FROM Match m
-			WHERE m.competitionTable.id = :tableId
-			AND m.startTime < :newEndTime
-			AND m.endTime > :newStartTime
-			AND (:currentMatchId IS NULL OR m.id <> :currentMatchId)
-			""")
+            SELECT m FROM Match m
+            WHERE m.competitionTable.id = :tableId
+            AND m.startTime < :newEndTime
+            AND m.endTime > :newStartTime
+            AND (:currentMatchId IS NULL OR m.id <> :currentMatchId)
+            """)
 	List<Match> findOverlappingMatchesByTable(
 		@Param("tableId") String tableId,
 		@Param("newStartTime") LocalTime newStartTime,
@@ -71,9 +71,21 @@ public interface MatchRepository extends
 		@Param("currentMatchId") Long currentMatchId);
 
 	@Query("""
-			SELECT m FROM Match m
-			WHERE m.teamA = :team OR m.teamB = :team
-			""")
+            SELECT m FROM Match m
+            WHERE m.teamA = :team OR m.teamB = :team
+            """)
 	@RestResource(exported = false)
 	List<Match> findByTeam(@Param("team") Team team);
+
+	@Query("""
+            SELECT m FROM Match m
+            JOIN FETCH m.competitionTable competitionTable
+            JOIN m.round round
+            WHERE round.edition.id = :editionId
+            AND m.competitionTable IS NOT NULL
+            AND m.state = cat.udl.eps.softarch.fll.domain.MatchState.SCHEDULED
+            ORDER BY competitionTable.id, m.startTime, m.id
+            """)
+	@RestResource(exported = false)
+	List<Match> findScheduledTableMatchesByEditionId(@Param("editionId") Long editionId);
 }
