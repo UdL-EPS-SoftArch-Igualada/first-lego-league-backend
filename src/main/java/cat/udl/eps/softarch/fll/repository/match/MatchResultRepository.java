@@ -58,4 +58,5 @@ public interface MatchResultRepository extends JpaRepository<MatchResult, Long> 
 
 	boolean existsByMatch(@Param("match") Match match);
 
+	boolean existsByTeam_NameAndMatch_Round_Id(String teamName, Long roundId);
 }

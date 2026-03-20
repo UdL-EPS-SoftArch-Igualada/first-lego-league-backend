@@ -41,6 +41,10 @@ public class User extends UriEntity<String> implements UserDetails {
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private boolean passwordReset;
 
+	@NotBlank
+	@Column(nullable = false)
+	private String roles = "ROLE_USER";
+
 	public static User create(String id, String email, String password) {
 		DomainValidation.requireNonBlank(id, "id");
 		DomainValidation.requireValidEmail(email, "email");
@@ -71,7 +75,7 @@ public class User extends UriEntity<String> implements UserDetails {
 	@JsonValue(value = false)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER");
+		return AuthorityUtils.commaSeparatedStringToAuthorityList(roles);
 	}
 
 	@Override
