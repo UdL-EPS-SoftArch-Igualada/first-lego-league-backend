@@ -20,7 +20,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
-import cat.udl.eps.softarch.fll.controller.dto.LeaderboardPageResponse;
+import cat.udl.eps.softarch.fll.controller.ranking.dto.LeaderboardPageResponse;
 import cat.udl.eps.softarch.fll.repository.edition.EditionRepository;
 import cat.udl.eps.softarch.fll.repository.match.MatchResultRepository;
 import cat.udl.eps.softarch.fll.repository.ranking.projection.LeaderboardRowProjection;
@@ -42,7 +42,7 @@ class LeaderboardServiceTest {
 		when(editionRepository.existsById(999L)).thenReturn(false);
 
 		ResponseStatusException ex = assertThrows(ResponseStatusException.class,
-				() -> leaderboardService.getEditionLeaderboard(999L, 0, 10));
+			() -> leaderboardService.getEditionLeaderboard(999L, 0, 10));
 
 		assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
 		verify(matchResultRepository, never()).findLeaderboardByEditionId(any(), any());
@@ -51,7 +51,7 @@ class LeaderboardServiceTest {
 	@Test
 	void getEditionLeaderboardShouldThrowBadRequestWhenPaginationIsInvalid() {
 		ResponseStatusException ex = assertThrows(ResponseStatusException.class,
-				() -> leaderboardService.getEditionLeaderboard(2025L, -1, 0));
+			() -> leaderboardService.getEditionLeaderboard(2025L, -1, 0));
 
 		assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
 		verify(editionRepository, never()).existsById(any());
@@ -61,7 +61,7 @@ class LeaderboardServiceTest {
 	@Test
 	void getEditionLeaderboardShouldThrowBadRequestWhenPaginationOverflowsPositionCalculation() {
 		ResponseStatusException ex = assertThrows(ResponseStatusException.class,
-				() -> leaderboardService.getEditionLeaderboard(2025L, Integer.MAX_VALUE, 2));
+			() -> leaderboardService.getEditionLeaderboard(2025L, Integer.MAX_VALUE, 2));
 
 		assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
 		verify(editionRepository, never()).existsById(any());
@@ -71,7 +71,7 @@ class LeaderboardServiceTest {
 	@Test
 	void getEditionLeaderboardShouldThrowBadRequestWhenPaginationOverflowsWithSizeOne() {
 		ResponseStatusException ex = assertThrows(ResponseStatusException.class,
-				() -> leaderboardService.getEditionLeaderboard(2025L, Integer.MAX_VALUE, 1));
+			() -> leaderboardService.getEditionLeaderboard(2025L, Integer.MAX_VALUE, 1));
 
 		assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
 		verify(editionRepository, never()).existsById(any());
@@ -97,8 +97,8 @@ class LeaderboardServiceTest {
 	void getEditionLeaderboardShouldMapRowsAndCalculateGlobalPositions() {
 		when(editionRepository.existsById(2025L)).thenReturn(true);
 		List<LeaderboardRowProjection> rows = List.of(
-				row("TeamA", "TeamA", 560L, 3L),
-				row("TeamB", "TeamB", 500L, 3L));
+			row("TeamA", "TeamA", 560L, 3L),
+			row("TeamB", "TeamB", 500L, 3L));
 		Page<LeaderboardRowProjection> page = new PageImpl<>(rows, PageRequest.of(1, 2), 6);
 		when(matchResultRepository.findLeaderboardByEditionId(2025L, PageRequest.of(1, 2))).thenReturn(page);
 

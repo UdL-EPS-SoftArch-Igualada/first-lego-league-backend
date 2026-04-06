@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import cat.udl.eps.softarch.fll.controller.dto.MatchTableAssignmentResponse;
+import cat.udl.eps.softarch.fll.controller.match.dto.MatchTableAssignmentResponse;
 import cat.udl.eps.softarch.fll.domain.CompetitionTable;
 import cat.udl.eps.softarch.fll.domain.Match;
 import cat.udl.eps.softarch.fll.repository.match.CompetitionTableRepository;
@@ -20,8 +20,8 @@ public class MatchTableAssignmentService {
 	private final CompetitionTableRepository competitionTableRepository;
 
 	public MatchTableAssignmentService(
-			MatchRepository matchRepository,
-			CompetitionTableRepository competitionTableRepository) {
+		MatchRepository matchRepository,
+		CompetitionTableRepository competitionTableRepository) {
 		this.matchRepository = matchRepository;
 		this.competitionTableRepository = competitionTableRepository;
 	}
@@ -29,9 +29,9 @@ public class MatchTableAssignmentService {
 	@Transactional
 	public MatchTableAssignmentResponse assignTable(Long matchId, String tableIdentifier) {
 		Match match = matchRepository.findByIdForUpdate(matchId)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Match not found: " + matchId));
+			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Match not found: " + matchId));
 		CompetitionTable table = competitionTableRepository.findByIdForUpdate(tableIdentifier)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Table not found: " + tableIdentifier));
+			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Table not found: " + tableIdentifier));
 
 		validateMatchSchedule(match);
 		validateTableAvailability(match, table);
@@ -40,10 +40,10 @@ public class MatchTableAssignmentService {
 		Match savedMatch = matchRepository.save(match);
 
 		return new MatchTableAssignmentResponse(
-				savedMatch.getId(),
-				savedMatch.getCompetitionTable().getId(),
-				savedMatch.getStartTime().format(TIME_FORMATTER),
-				savedMatch.getEndTime().format(TIME_FORMATTER));
+			savedMatch.getId(),
+			savedMatch.getCompetitionTable().getId(),
+			savedMatch.getStartTime().format(TIME_FORMATTER),
+			savedMatch.getEndTime().format(TIME_FORMATTER));
 	}
 
 	private void validateMatchSchedule(Match match) {
@@ -60,7 +60,7 @@ public class MatchTableAssignmentService {
 
 	private void validateTableAvailability(Match match, CompetitionTable table) {
 		if (matchRepository.existsOverlappingAssignmentsForTable(
-				table, match.getStartTime(), match.getEndTime(), match.getId())) {
+			table, match.getStartTime(), match.getEndTime(), match.getId())) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, "Table has overlapping scheduled match");
 		}
 	}

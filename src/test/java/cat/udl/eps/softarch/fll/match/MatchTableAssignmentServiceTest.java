@@ -17,7 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
-import cat.udl.eps.softarch.fll.controller.dto.MatchTableAssignmentResponse;
+import cat.udl.eps.softarch.fll.controller.match.dto.MatchTableAssignmentResponse;
 import cat.udl.eps.softarch.fll.domain.CompetitionTable;
 import cat.udl.eps.softarch.fll.domain.Match;
 import cat.udl.eps.softarch.fll.repository.match.CompetitionTableRepository;
@@ -45,7 +45,7 @@ class MatchTableAssignmentServiceTest {
 		when(matchRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(match));
 		when(competitionTableRepository.findByIdForUpdate("Table-1")).thenReturn(Optional.of(table));
 		when(matchRepository.existsOverlappingAssignmentsForTable(table, match.getStartTime(), match.getEndTime(), 10L))
-				.thenReturn(false);
+			.thenReturn(false);
 		when(matchRepository.save(any(Match.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
 		MatchTableAssignmentResponse response = service.assignTable(10L, "Table-1");
@@ -85,7 +85,7 @@ class MatchTableAssignmentServiceTest {
 		when(matchRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(match));
 		when(competitionTableRepository.findByIdForUpdate("Table-1")).thenReturn(Optional.of(table));
 		when(matchRepository.existsOverlappingAssignmentsForTable(table, match.getStartTime(), match.getEndTime(), 10L))
-				.thenReturn(true);
+			.thenReturn(true);
 
 		ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> service.assignTable(10L, "Table-1"));
 
@@ -99,7 +99,7 @@ class MatchTableAssignmentServiceTest {
 		when(matchRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(match));
 		when(competitionTableRepository.findByIdForUpdate("Table-2")).thenReturn(Optional.of(newTable));
 		when(matchRepository.existsOverlappingAssignmentsForTable(newTable, match.getStartTime(), match.getEndTime(), 10L))
-				.thenReturn(false);
+			.thenReturn(false);
 		when(matchRepository.save(any(Match.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
 		MatchTableAssignmentResponse response = service.assignTable(10L, "Table-2");

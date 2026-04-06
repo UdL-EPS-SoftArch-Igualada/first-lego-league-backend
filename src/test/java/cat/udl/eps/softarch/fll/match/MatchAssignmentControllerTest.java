@@ -7,16 +7,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.util.List;
 
-import cat.udl.eps.softarch.fll.controller.MatchAssignmentController;
+import cat.udl.eps.softarch.fll.controller.match.MatchAssignmentController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import cat.udl.eps.softarch.fll.controller.dto.BatchMatchAssignmentItemRequest;
-import cat.udl.eps.softarch.fll.controller.dto.BatchMatchAssignmentItemResponse;
-import cat.udl.eps.softarch.fll.controller.dto.BatchMatchAssignmentResponse;
+import cat.udl.eps.softarch.fll.controller.match.dto.BatchMatchAssignmentItemRequest;
+import cat.udl.eps.softarch.fll.controller.match.dto.BatchMatchAssignmentItemResponse;
+import cat.udl.eps.softarch.fll.controller.match.dto.BatchMatchAssignmentResponse;
 import cat.udl.eps.softarch.fll.domain.Match;
 import cat.udl.eps.softarch.fll.domain.volunteer.Referee;
 import cat.udl.eps.softarch.fll.exception.MatchAssignmentErrorCode;
@@ -55,10 +55,10 @@ class MatchAssignmentControllerTest {
 		mockMvc.perform(post("/matchAssignments/assign")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"matchId\":\"1\",\"refereeId\":\"2\"}"))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.matchId").value("1"))
-				.andExpect(jsonPath("$.refereeId").value("2"))
-				.andExpect(jsonPath("$.status").value("ASSIGNED"));
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.matchId").value("1"))
+			.andExpect(jsonPath("$.refereeId").value("2"))
+			.andExpect(jsonPath("$.status").value("ASSIGNED"));
 	}
 
 	@Test
@@ -71,12 +71,12 @@ class MatchAssignmentControllerTest {
 		mockMvc.perform(post("/matchAssignments/assign")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"matchId\":\"1\",\"refereeId\":\"2\"}"))
-				.andExpect(status().isConflict())
-				.andExpect(jsonPath("$.error").value("AVAILABILITY_CONFLICT"))
-				.andExpect(jsonPath("$.message")
-						.value("Referee is already assigned to another overlapping match"))
-				.andExpect(jsonPath("$.timestamp").isNotEmpty())
-				.andExpect(jsonPath("$.path").value("/matchAssignments/assign"));
+			.andExpect(status().isConflict())
+			.andExpect(jsonPath("$.error").value("AVAILABILITY_CONFLICT"))
+			.andExpect(jsonPath("$.message")
+				.value("Referee is already assigned to another overlapping match"))
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.path").value("/matchAssignments/assign"));
 	}
 
 	@Test
@@ -131,21 +131,21 @@ class MatchAssignmentControllerTest {
 		mockMvc.perform(post("/matchAssignments/batch")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("""
-						{
-						  "roundId": "3",
-						  "assignments": [
-						    {"matchId":"10","refereeId":"20"},
-						    {"matchId":"11","refereeId":"20"}
-						  ]
-						}
-						"""))
-				.andExpect(status().isConflict())
-				.andExpect(jsonPath("$.error").value("BATCH_ASSIGNMENT_FAILED"))
-				.andExpect(jsonPath("$.timestamp").isNotEmpty())
-				.andExpect(jsonPath("$.path").value("/matchAssignments/batch"))
-				.andExpect(jsonPath("$.details.index").value(1))
-				.andExpect(jsonPath("$.details.matchId").value("11"))
-				.andExpect(jsonPath("$.details.refereeId").value("20"))
-				.andExpect(jsonPath("$.details.cause").value("AVAILABILITY_CONFLICT"));
+					{
+					  "roundId": "3",
+					  "assignments": [
+					    {"matchId":"10","refereeId":"20"},
+					    {"matchId":"11","refereeId":"20"}
+					  ]
+					}
+					"""))
+			.andExpect(status().isConflict())
+			.andExpect(jsonPath("$.error").value("BATCH_ASSIGNMENT_FAILED"))
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.path").value("/matchAssignments/batch"))
+			.andExpect(jsonPath("$.details.index").value(1))
+			.andExpect(jsonPath("$.details.matchId").value("11"))
+			.andExpect(jsonPath("$.details.refereeId").value("20"))
+			.andExpect(jsonPath("$.details.cause").value("AVAILABILITY_CONFLICT"));
 	}
 }

@@ -6,7 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import cat.udl.eps.softarch.fll.controller.MatchController;
+import cat.udl.eps.softarch.fll.controller.match.MatchController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.server.ResponseStatusException;
-import cat.udl.eps.softarch.fll.controller.dto.MatchTableAssignmentResponse;
+import cat.udl.eps.softarch.fll.controller.match.dto.MatchTableAssignmentResponse;
 import cat.udl.eps.softarch.fll.exception.GlobalExceptionHandler;
 import cat.udl.eps.softarch.fll.service.MatchTableAssignmentService;
 
@@ -32,9 +32,9 @@ class MatchControllerTest {
 		validator.afterPropertiesSet();
 
 		mockMvc = MockMvcBuilders.standaloneSetup(controller)
-				.setControllerAdvice(new GlobalExceptionHandler())
-				.setValidator(validator)
-				.build();
+			.setControllerAdvice(new GlobalExceptionHandler())
+			.setValidator(validator)
+			.build();
 	}
 
 	@Test
@@ -45,33 +45,33 @@ class MatchControllerTest {
 		mockMvc.perform(post("/matches/15/assign-table")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"tableIdentifier\":\"Table-1\"}"))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.matchId").value(15))
-				.andExpect(jsonPath("$.tableIdentifier").value("Table-1"))
-				.andExpect(jsonPath("$.startTime").value("11:00"))
-				.andExpect(jsonPath("$.endTime").value("11:20"));
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.matchId").value(15))
+			.andExpect(jsonPath("$.tableIdentifier").value("Table-1"))
+			.andExpect(jsonPath("$.startTime").value("11:00"))
+			.andExpect(jsonPath("$.endTime").value("11:20"));
 	}
 
 	@Test
 	void assignTableReturnsNotFound() throws Exception {
 		when(matchTableAssignmentService.assignTable(15L, "Table-1")).thenThrow(
-				new ResponseStatusException(HttpStatus.NOT_FOUND, "Table not found: Table-1"));
+			new ResponseStatusException(HttpStatus.NOT_FOUND, "Table not found: Table-1"));
 
 		mockMvc.perform(post("/matches/15/assign-table")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"tableIdentifier\":\"Table-1\"}"))
-				.andExpect(status().isNotFound());
+			.andExpect(status().isNotFound());
 	}
 
 	@Test
 	void assignTableReturnsConflict() throws Exception {
 		when(matchTableAssignmentService.assignTable(15L, "Table-1")).thenThrow(
-				new ResponseStatusException(HttpStatus.CONFLICT, "Table has overlapping scheduled match"));
+			new ResponseStatusException(HttpStatus.CONFLICT, "Table has overlapping scheduled match"));
 
 		mockMvc.perform(post("/matches/15/assign-table")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"tableIdentifier\":\"Table-1\"}"))
-				.andExpect(status().isConflict());
+			.andExpect(status().isConflict());
 	}
 
 	@Test
@@ -79,10 +79,10 @@ class MatchControllerTest {
 		mockMvc.perform(post("/matches/15/assign-table")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"tableIdentifier\":\"\"}"))
-				.andExpect(status().isUnprocessableContent())
-				.andExpect(jsonPath("$.error").value("VALIDATION_ERROR"))
-				.andExpect(jsonPath("$.message").isNotEmpty())
-				.andExpect(jsonPath("$.timestamp").isNotEmpty())
-				.andExpect(jsonPath("$.path").value("/matches/15/assign-table"));
-}
+			.andExpect(status().isUnprocessableContent())
+			.andExpect(jsonPath("$.error").value("VALIDATION_ERROR"))
+			.andExpect(jsonPath("$.message").isNotEmpty())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.path").value("/matches/15/assign-table"));
+	}
 }

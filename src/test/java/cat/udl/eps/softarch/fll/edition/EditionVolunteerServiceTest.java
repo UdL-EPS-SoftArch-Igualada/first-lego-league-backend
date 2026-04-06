@@ -13,7 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import cat.udl.eps.softarch.fll.controller.dto.EditionVolunteersResponse;
+import cat.udl.eps.softarch.fll.controller.edition.dto.EditionVolunteersResponse;
 import cat.udl.eps.softarch.fll.domain.volunteer.Floater;
 import cat.udl.eps.softarch.fll.domain.volunteer.Judge;
 import cat.udl.eps.softarch.fll.domain.volunteer.Referee;

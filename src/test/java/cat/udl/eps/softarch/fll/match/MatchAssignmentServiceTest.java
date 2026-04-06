@@ -1,7 +1,7 @@
 package cat.udl.eps.softarch.fll.match;
 
-import cat.udl.eps.softarch.fll.controller.dto.BatchMatchAssignmentItemRequest;
-import cat.udl.eps.softarch.fll.controller.dto.BatchMatchAssignmentResponse;
+import cat.udl.eps.softarch.fll.controller.match.dto.BatchMatchAssignmentItemRequest;
+import cat.udl.eps.softarch.fll.controller.match.dto.BatchMatchAssignmentResponse;
 import cat.udl.eps.softarch.fll.domain.volunteer.Floater;
 import cat.udl.eps.softarch.fll.domain.Match;
 import cat.udl.eps.softarch.fll.domain.MatchState;
