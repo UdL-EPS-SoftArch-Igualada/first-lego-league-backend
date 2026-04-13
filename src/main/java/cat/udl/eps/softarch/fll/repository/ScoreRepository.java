@@ -10,6 +10,6 @@ public interface ScoreRepository extends JpaRepository<Score, Long> {
 
 	List<Score> findByRound_Id(Long roundId);
 
-	boolean existsByRound_IdAndTeam_Name(Long roundId, String teamName);
+	boolean existsByRound_IdAndTeam_Id(Long roundId, Long teamId);
 
 }

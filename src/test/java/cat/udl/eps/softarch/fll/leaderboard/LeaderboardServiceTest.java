@@ -114,9 +114,9 @@ class LeaderboardServiceTest {
 
 	private LeaderboardRowProjection row(String teamId, String teamName, Long totalScore, Long matchesPlayed) {
 		LeaderboardRowProjection projection = mock(LeaderboardRowProjection.class);
-		when(projection.getTeamId()).thenReturn(teamId);
+		when(projection.getTeamId()).thenReturn(Long.valueOf(teamId));
 		when(projection.getTeamName()).thenReturn(teamName);
-		when(projection.getTotalScore()).thenReturn(totalScore);
+		when(projection.getTotalScore()).thenReturn(Math.toIntExact(totalScore));
 		when(projection.getMatchesPlayed()).thenReturn(matchesPlayed);
 		return projection;
 	}

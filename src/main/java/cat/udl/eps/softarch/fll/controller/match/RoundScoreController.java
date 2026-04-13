@@ -67,17 +67,17 @@ public class RoundScoreController {
 			return ResponseEntity.badRequest().body("Team is mandatory");
 		}
 
-		Team team = teamRepository.findById(teamId).orElse(null);
+		Team team = teamRepository.findById(Long.valueOf(teamId)).orElse(null);
 		if (team == null) {
 			return ResponseEntity.badRequest().body("Team does not exist");
 		}
 
-		boolean participates = matchResultRepository.existsByTeam_NameAndMatch_Round_Id(teamId, roundId);
+		boolean participates = matchResultRepository.existsByTeam_IdAndMatch_Round_Id(Long.valueOf(teamId), roundId);
 		if (!participates) {
 			return ResponseEntity.badRequest().body("Team is not registered in the competition");
 		}
 
-		if (scoreRepository.existsByRound_IdAndTeam_Name(roundId, teamId)) {
+		if (scoreRepository.existsByRound_IdAndTeam_Id(roundId, Long.valueOf(teamId))) {
 			return ResponseEntity.badRequest().body("Team already has a score for this round");
 		}
 

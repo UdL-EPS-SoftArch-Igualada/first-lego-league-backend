@@ -26,7 +26,7 @@ public class EditionTeamRegistrationService {
 	}
 
 	@Transactional
-	public Edition registerTeam(Long editionId, String teamId) {
+	public Edition registerTeam(Long editionId, Long teamId) {
 		Edition edition = editionRepository.findByIdForUpdate(editionId)
 				.orElseThrow(() -> new EditionTeamRegistrationException(
 						"EDITION_NOT_FOUND", "Edition with id " + editionId + " not found"));
@@ -37,7 +37,7 @@ public class EditionTeamRegistrationService {
 			throw new EditionTeamRegistrationException(exception.getError(), exception.getMessage(), exception);
 		}
 
-		Team team = teamRepository.findById(teamId)
+		Team team = teamRepository.findById(Long.valueOf(teamId))
 				.orElseThrow(() -> new EditionTeamRegistrationException(
 						"TEAM_NOT_FOUND", "Team with id " + teamId + " not found"));
 

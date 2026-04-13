@@ -185,7 +185,7 @@ public class ScoreStepDefs {
 		match = matchRepository.save(match);
 		matchUri = "http://localhost/matches/" + match.getId();
 
-		String teamId = extractTeamId(teamUri);
+		Long teamId = Long.valueOf(extractTeamId(teamUri));
 		Team team = teamRepository.findById(teamId)
 				.orElseThrow(() -> new RuntimeException("TEAM NOT FOUND: " + teamId));
 

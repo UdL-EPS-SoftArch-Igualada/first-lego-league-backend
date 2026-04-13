@@ -58,8 +58,8 @@ public class MatchSearchService {
 	}
 
 	public List<MatchSearchItemResponse> findByTeam(String teamUri) {
-		String teamName = teamUri.contains("/") ? teamUri.substring(teamUri.lastIndexOf('/') + 1) : teamUri;
-		Team team = teamRepository.findById(teamName)
+		Long id = Long.valueOf(teamUri.contains("/") ? teamUri.substring(teamUri.lastIndexOf('/') + 1) : teamUri);
+		Team team = teamRepository.findById(Long.valueOf(id))
 			.orElseThrow(() -> new IllegalArgumentException("TEAM_NOT_FOUND"));
 		return matchRepository.findByTeam(team).stream()
 			.map(this::toDto)
