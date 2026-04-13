@@ -50,11 +50,11 @@ public class TeamMemberStepDefs {
 	}
 
 	@Given("a team with name {string} exists for team member management")
-	public void aTeamWithNameExistsForTeamMemberManagement(String teamName) {
-		if (teamRepository.existsById(teamName)) {
+	public void aTeamWithNameExistsForTeamMemberManagement(String name) {
+		if (teamRepository.findByName(name)) {
 			return;
 		}
-		Team team = Team.create(teamName, "Igualada", 2005, "Challenge");
+		Team team = Team.create(name, "Igualada", 2005, "Challenge");
 		teamRepository.save(team);
 	}
 

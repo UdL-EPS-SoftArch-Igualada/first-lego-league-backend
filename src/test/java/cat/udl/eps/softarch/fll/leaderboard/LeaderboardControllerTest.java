@@ -44,8 +44,8 @@ class LeaderboardControllerTest {
 			10,
 			2,
 			List.of(
-				new LeaderboardItemResponse(1, "TeamA", "TeamA", 560L, 3L),
-				new LeaderboardItemResponse(2, "TeamB", "TeamB", 500L, 3L)));
+				new LeaderboardItemResponse(1, 1L, "TeamA", 560, 3L),
+				new LeaderboardItemResponse(2, 2L, "TeamB", 500, 3L)));
 
 		when(leaderboardService.getEditionLeaderboard(2025L, 0, 10)).thenReturn(response);
 
@@ -79,7 +79,7 @@ class LeaderboardControllerTest {
 			1,
 			1,
 			3,
-			List.of(new LeaderboardItemResponse(2, "TeamB", "TeamB", 500L, 3L)));
+			List.of(new LeaderboardItemResponse(2, 2L, "TeamB", 500, 3L)));
 
 		when(leaderboardService.getEditionLeaderboard(2025L, 1, 1)).thenReturn(response);
 

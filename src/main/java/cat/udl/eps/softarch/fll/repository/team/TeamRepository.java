@@ -33,7 +33,7 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
 
 	List<Team> findByMembersRole(@Param("role") String role);
 
-	Optional<Team> findByName(@Param("name") String name);
+	boolean findByName(@Param("name") String name);
 
 	@RestResource(exported = false)
 	@Query("""
@@ -43,4 +43,6 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
         WHERE t.name = :name
     """)
 	Optional<Team> findByNameWithRegisteredEditions(@Param("name") String name);
+
+	boolean existsByName(String id);
 }
