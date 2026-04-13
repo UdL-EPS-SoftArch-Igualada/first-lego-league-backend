@@ -1,11 +1,8 @@
 package cat.udl.eps.softarch.fll.repository.ranking.projection;
 
 public interface LeaderboardRowProjection {
-	String getTeamId();
-
+	Long getTeamId();
 	String getTeamName();
-
-	Long getTotalScore();
-
+	Integer getTotalScore();
 	Long getMatchesPlayed();
 }

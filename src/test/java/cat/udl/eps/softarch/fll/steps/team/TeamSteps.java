@@ -55,14 +55,14 @@ public class TeamSteps {
 	}
 
 	@Then("the team {string} should exist in the system")
-	public void theTeamShouldExist(String name) {
-		assertTrue(teamRepository.existsById(name));
+	public void theTeamShouldExist(Long Id) {
+		assertTrue(teamRepository.existsById(Id));
 	}
 
 	@Then("the team should have {int} members")
 	@Transactional
 	public void theTeamShouldHaveMembers(int count) {
-		Team savedTeam = teamRepository.findById(currentTeam.getId()).orElseThrow();
+		Team savedTeam = teamRepository.findById(Long.valueOf(currentTeam.getId())).orElseThrow();
 		assertEquals(count, savedTeam.getMembers().size());
 	}
 
@@ -95,7 +95,7 @@ public class TeamSteps {
 	@Transactional
 	public void tryAddExtraMember() {
 		try {
-			Team loadedTeam = teamRepository.findById(currentTeam.getId()).orElseThrow();
+			Team loadedTeam = teamRepository.findById(Long.valueOf(currentTeam.getId())).orElseThrow();
 			TeamMember.create("Extra Member", "Substitute", LocalDate.of(2012, 5, 5), loadedTeam);
 			teamRepository.save(loadedTeam);
 		} catch (Exception e) {
@@ -127,13 +127,13 @@ public class TeamSteps {
 	}
 
 	@When("I delete the team {string}")
-	public void deleteTeam(String name) {
-		teamRepository.deleteById(name);
+	public void deleteTeam(Long id) {
+		teamRepository.deleteById(id);
 	}
 
 	@Then("the team {string} should not exist")
-	public void teamShouldNotExist(String name) {
-		assertFalse(teamRepository.existsById(name));
+	public void teamShouldNotExist(Long Id) {
+		assertFalse(teamRepository.existsById(Id));
 	}
 
 	@Then("no members should exist in the system")
@@ -143,14 +143,13 @@ public class TeamSteps {
 
 	@When("I change the city to {string}")
 	public void iChangeTheCity(String newCity) {
-		currentTeam = teamRepository.findById(currentTeam.getId()).orElseThrow();
-		currentTeam.setCity(newCity);
-		teamRepository.save(currentTeam);
+		Team team = teamRepository.findById(Long.valueOf(currentTeam.getId())).orElseThrow();
+		team.setCity(newCity);
+		currentTeam = teamRepository.save(team);
 	}
-
 	@Then("the team {string} should be in {string}")
-	public void verifyTeamCity(String name, String expectedCity) {
-		Team t = teamRepository.findById(name).orElseThrow();
+	public void verifyTeamCity(Long id, String expectedCity) {
+		Team t = teamRepository.findById(id).orElseThrow();
 		assertEquals(expectedCity, t.getCity());
 	}
 

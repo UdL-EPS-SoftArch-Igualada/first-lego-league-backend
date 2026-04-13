@@ -2,9 +2,9 @@ package cat.udl.eps.softarch.fll.controller.ranking.dto;
 
 public record LeaderboardItemResponse(
 	int position,
-	String teamId,
+	Long teamId,
 	String teamName,
-	Long totalScore,
+	Integer totalScore,
 	Long matchesPlayed
 ) {
 }
