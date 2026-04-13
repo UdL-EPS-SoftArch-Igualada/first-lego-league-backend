@@ -55,8 +55,8 @@ public class TeamSteps {
 	}
 
 	@Then("the team {string} should exist in the system")
-	public void theTeamShouldExist(Long Id) {
-		assertTrue(teamRepository.existsById(Id));
+	public void theTeamShouldExist(Long id) {
+		assertTrue(teamRepository.existsById(id));
 	}
 
 	@Then("the team should have {int} members")
@@ -132,8 +132,8 @@ public class TeamSteps {
 	}
 
 	@Then("the team {string} should not exist")
-	public void teamShouldNotExist(Long Id) {
-		assertFalse(teamRepository.existsById(Id));
+	public void teamShouldNotExist(Long id) {
+		assertFalse(teamRepository.existsById(id));
 	}
 
 	@Then("no members should exist in the system")
