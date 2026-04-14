@@ -1,4 +1,5 @@
 package cat.udl.eps.softarch.fll.service.match;
+//package cat.udl.eps.softarch.fll.service.match;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -57,10 +58,22 @@ public class MatchSearchService {
 		}
 	}
 
-	public List<MatchSearchItemResponse> findByTeam(String teamUri) {
-		String teamName = teamUri.contains("/") ? teamUri.substring(teamUri.lastIndexOf('/') + 1) : teamUri;
-		Team team = teamRepository.findById(teamName)
+	public List<MatchSearchItemResponse> findByTeam(String teamId) {
+		Long id;
+		try {
+			if (teamId.contains("/")) {
+				String idStr = teamId.substring(teamId.lastIndexOf('/') + 1);
+				id = Long.parseLong(idStr);
+			} else {
+				id = Long.parseLong(teamId);
+			}
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException("Invalid team ID format: " + teamId);
+		}
+
+		Team team = teamRepository.findById(id)
 			.orElseThrow(() -> new IllegalArgumentException("TEAM_NOT_FOUND"));
+
 		return matchRepository.findByTeam(team).stream()
 			.map(this::toDto)
 			.toList();

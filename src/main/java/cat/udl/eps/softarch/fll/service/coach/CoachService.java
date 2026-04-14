@@ -22,16 +22,9 @@ public class CoachService {
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	public AssignCoachResponse assignCoach(String teamId, Integer coachId) {
+	public AssignCoachResponse assignCoach(Long teamId, Integer coachId) {
 
-		Long teamLongId;
-		try {
-			teamLongId = Long.parseLong(teamId);
-		} catch (NumberFormatException e) {
-			throw new TeamCoachAssignmentException("TEAM_NOT_FOUND", "Invalid team ID format: " + teamId);
-		}
-
-		Team team = entityManager.find(Team.class, teamLongId, LockModeType.PESSIMISTIC_WRITE);
+		Team team = entityManager.find(Team.class, teamId, LockModeType.PESSIMISTIC_WRITE);
 		if (team == null) {
 			throw new TeamCoachAssignmentException("TEAM_NOT_FOUND", "Team not found");
 		}
@@ -46,9 +39,10 @@ public class CoachService {
 		} catch (IllegalStateException exception) {
 			throw toAssignmentException(exception);
 		}
+
 		teamRepository.save(team);
 
-		return new AssignCoachResponse(teamId, coachId, "ASSIGNED");
+		return new AssignCoachResponse(String.valueOf(teamId), coachId, "ASSIGNED");
 	}
 
 	private TeamCoachAssignmentException toAssignmentException(IllegalStateException exception) {

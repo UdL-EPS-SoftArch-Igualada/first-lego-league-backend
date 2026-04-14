@@ -18,8 +18,8 @@ public class EditionTeamRegistrationService {
 	private final EditionLifecycleService editionLifecycleService;
 
 	public EditionTeamRegistrationService(EditionRepository editionRepository,
-			TeamRepository teamRepository,
-			EditionLifecycleService editionLifecycleService) {
+										  TeamRepository teamRepository,
+										  EditionLifecycleService editionLifecycleService) {
 		this.editionRepository = editionRepository;
 		this.teamRepository = teamRepository;
 		this.editionLifecycleService = editionLifecycleService;
@@ -27,12 +27,15 @@ public class EditionTeamRegistrationService {
 
 	@Transactional
 	public Edition registerTeam(Long editionId, Long teamId) {
-
 		Edition edition = editionRepository.findByIdForUpdate(editionId)
 			.orElseThrow(() -> new EditionTeamRegistrationException(
 				"EDITION_NOT_FOUND", "Edition with id " + editionId + " not found"));
 
-		editionLifecycleService.assertOperationAllowed(edition, EditionOperation.TEAM_REGISTRATION);
+		try {
+			editionLifecycleService.assertOperationAllowed(edition, EditionOperation.TEAM_REGISTRATION);
+		} catch (EditionLifecycleException exception) {
+			throw new EditionTeamRegistrationException(exception.getError(), exception.getMessage(), exception);
+		}
 
 		Team team = teamRepository.findById(teamId)
 			.orElseThrow(() -> new EditionTeamRegistrationException(
@@ -40,8 +43,7 @@ public class EditionTeamRegistrationService {
 
 		if (edition.containsTeam(team)) {
 			throw new EditionTeamRegistrationException(
-				"TEAM_ALREADY_REGISTERED",
-				"Team " + teamId + " is already registered in edition " + editionId);
+				"TEAM_ALREADY_REGISTERED", "Team " + teamId + " is already registered in edition " + editionId);
 		}
 
 		if (edition.hasReachedMaxTeams()) {
