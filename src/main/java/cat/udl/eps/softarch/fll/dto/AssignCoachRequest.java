@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class AssignCoachRequest {
 	@NotBlank
-	private String teamId;
+	private Long teamId;
 	@NotNull
 	private Integer coachId;
 }
