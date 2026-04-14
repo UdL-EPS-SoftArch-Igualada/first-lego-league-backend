@@ -1,5 +1,6 @@
 package cat.udl.eps.softarch.fll.controller.edition;
 
+import java.io.Serializable;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +21,8 @@ public class EditionTeamController {
 
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/editions/{editionId}/teams/{teamId}")
-	public ResponseEntity<Map<String, String>> registerTeam(
-		@PathVariable Long editionId, @PathVariable String teamId) {
+	public ResponseEntity<Map<String, Serializable>> registerTeam(
+		@PathVariable Long editionId, @PathVariable Long teamId) {
 		registrationService.registerTeam(editionId, teamId);
 		return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
 			"editionId", editionId.toString(),

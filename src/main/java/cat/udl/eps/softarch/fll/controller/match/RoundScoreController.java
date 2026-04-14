@@ -64,8 +64,8 @@ public class RoundScoreController {
 			return ResponseEntity.notFound().build();
 		}
 
-		String teamId = extractTeamId(body.getTeam());
-		if (teamId == null || teamId.isBlank()) {
+		Long teamId = Long.valueOf(extractTeamId(body.getTeam()));
+		if (teamId == null) {
 			return ResponseEntity.badRequest().body("Team is mandatory");
 		}
 
@@ -74,12 +74,12 @@ public class RoundScoreController {
 			return ResponseEntity.badRequest().body("Team does not exist");
 		}
 
-		boolean participates = matchResultRepository.existsByTeam_NameAndMatch_Round_Id(teamId, roundId);
+		boolean participates = matchResultRepository.existsByTeam_NameAndMatch_Round_Id(team.getName(), roundId);
 		if (!participates) {
 			return ResponseEntity.badRequest().body("Team is not registered in the competition");
 		}
 
-		if (scoreRepository.existsByRound_IdAndTeam_Name(roundId, teamId)) {
+		if (scoreRepository.existsByRound_IdAndTeam_Name(roundId, team.getName())) {
 			return ResponseEntity.badRequest().body("Team already has a score for this round");
 		}
 
