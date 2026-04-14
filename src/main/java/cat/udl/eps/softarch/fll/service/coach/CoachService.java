@@ -24,10 +24,18 @@ public class CoachService {
 
 	public AssignCoachResponse assignCoach(String teamId, Integer coachId) {
 
-		Team team = entityManager.find(Team.class, teamId, LockModeType.PESSIMISTIC_WRITE);
+		Long teamLongId;
+		try {
+			teamLongId = Long.parseLong(teamId);
+		} catch (NumberFormatException e) {
+			throw new TeamCoachAssignmentException("TEAM_NOT_FOUND", "Invalid team ID format: " + teamId);
+		}
+
+		Team team = entityManager.find(Team.class, teamLongId, LockModeType.PESSIMISTIC_WRITE);
 		if (team == null) {
 			throw new TeamCoachAssignmentException("TEAM_NOT_FOUND", "Team not found");
 		}
+
 		Coach coach = entityManager.find(Coach.class, coachId, LockModeType.PESSIMISTIC_WRITE);
 		if (coach == null) {
 			throw new TeamCoachAssignmentException("COACH_NOT_FOUND", "Coach not found");
