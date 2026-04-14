@@ -33,6 +33,7 @@ public class TeamMemberStepDefs {
 
 	private String latestTeamMemberUri;
 	private Long latestTeamMemberId;
+	private final java.util.Map<String, Long> teamIdByName = new java.util.HashMap<>();
 
 	public TeamMemberStepDefs(StepDefs stepDefs, TeamRepository teamRepository, TeamMemberRepository teamMemberRepository) {
 		this.stepDefs = stepDefs;
@@ -47,15 +48,24 @@ public class TeamMemberStepDefs {
 		stepDefs.result = null;
 		latestTeamMemberUri = null;
 		latestTeamMemberId = null;
+		teamIdByName.clear();
 	}
 
 	@Given("a team with name {string} exists for team member management")
 	public void aTeamWithNameExistsForTeamMemberManagement(String teamName) {
-		if (teamRepository.findbyName(teamName)) {
+		if (teamIdByName.containsKey(teamName)) {
 			return;
 		}
+
+		if (teamRepository.findbyName(teamName).isNew()) {
+			Team existingTeam = teamRepository.findbyName(teamName);
+			teamIdByName.put(teamName, existingTeam.getId());
+			return;
+		}
+
 		Team team = Team.create(teamName, "Igualada", 2005, "Challenge");
-		teamRepository.save(team);
+		team = teamRepository.save(team);
+		teamIdByName.put(teamName, team.getId());
 	}
 
 	@When("I create a team member with name {string} birth date {string} and role {string} for team {string}")
@@ -115,11 +125,11 @@ public class TeamMemberStepDefs {
 	public void iSearchTeamMembersByRole(String role) throws Exception {
 		stepDefs.result = stepDefs.mockMvc.perform(
 				get("/teamMembers/search/findByRole")
-						.param("role", role)
-						.accept(MediaType.APPLICATION_JSON)
-						.characterEncoding(StandardCharsets.UTF_8)
-						.with(AuthenticationStepDefs.authenticate()))
-				.andDo(print());
+					.param("role", role)
+					.accept(MediaType.APPLICATION_JSON)
+					.characterEncoding(StandardCharsets.UTF_8)
+					.with(AuthenticationStepDefs.authenticate()))
+			.andDo(print());
 	}
 
 	@When("I delete the created team member")
@@ -153,6 +163,7 @@ public class TeamMemberStepDefs {
 	@Then("The created team member is linked to team {string}")
 	public void theCreatedTeamMemberIsLinkedToTeam(String expectedTeamName) throws Exception {
 		assertLatestTeamMemberUriPresent();
+		Long expectedTeamId = teamIdByName.get(expectedTeamName);
 		stepDefs.mockMvc.perform(
 				get(pathFromAbsoluteUri(latestTeamMemberUri) + "/team")
 					.accept(MediaType.APPLICATION_JSON)
@@ -160,7 +171,7 @@ public class TeamMemberStepDefs {
 					.with(AuthenticationStepDefs.authenticate()))
 			.andDo(print())
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.id", is(expectedTeamName)));
+			.andExpect(jsonPath("$.id").value(expectedTeamId));
 	}
 
 	@Then("The response contains team member name {string} and role {string}")
@@ -191,7 +202,11 @@ public class TeamMemberStepDefs {
 	}
 
 	private String absoluteTeamUri(String teamName) {
-		return "http://localhost/teams/" + UriUtils.encodePathSegment(teamName, StandardCharsets.UTF_8);
+		Long teamId = teamIdByName.get(teamName);
+		if (teamId == null) {
+			throw new IllegalStateException("Team not found: " + teamName);
+		}
+		return "http://localhost/teams/" + teamId;
 	}
 
 	private void captureLatestTeamMemberIfCreated() throws Exception {

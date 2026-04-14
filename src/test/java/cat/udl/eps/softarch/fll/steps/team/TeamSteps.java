@@ -10,6 +10,7 @@ import io.cucumber.java.en.When;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.stream.IntStream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -56,7 +57,7 @@ public class TeamSteps {
 
 	@Then("the team {string} should exist in the system")
 	public void theTeamShouldExist(String name) {
-		assertTrue(teamRepository.findbyName(name));
+		assertTrue((BooleanSupplier) teamRepository.findbyName(name));
 	}
 
 	@Then("the team should have {int} members")
