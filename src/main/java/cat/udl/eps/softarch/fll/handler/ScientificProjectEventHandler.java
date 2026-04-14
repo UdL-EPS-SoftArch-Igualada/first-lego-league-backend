@@ -38,38 +38,37 @@ public class ScientificProjectEventHandler {
 	}
 
 	private void validateTeam(ScientificProject project) {
-		if (project.getTeam() == null || project.getTeam().getId() == null || project.getTeam().getId().isBlank()) {
+		if (project.getTeam() == null || project.getTeam().getId() == null) {
 			throw new DomainValidationException("TEAM_REQUIRED",
-					"A scientific project must have an associated team");
+				"A scientific project must have an associated team");
 		}
 
-		if (!teamRepository.existsById(project.getTeam().getId())) {
-			throw new DomainValidationException("TEAM_NOT_FOUND",
-					"The referenced team does not exist");
-		}
 	}
 
 	private void validateEdition(ScientificProject project) {
 		if (project.getEdition() == null || project.getEdition().getId() == null) {
 			throw new DomainValidationException("EDITION_REQUIRED",
-					"A scientific project must belong to an edition");
+				"A scientific project must belong to an edition");
 		}
 
 		if (!editionRepository.existsById(project.getEdition().getId())) {
 			throw new DomainValidationException("EDITION_NOT_FOUND",
-					"The referenced edition does not exist");
+				"The referenced edition does not exist");
 		}
 	}
 
 	private void validateTeamEditionCompatibility(ScientificProject project) {
 		if (project.getTeam() == null || project.getTeam().getId() == null
-				|| project.getEdition() == null || project.getEdition().getId() == null) {
+			|| project.getEdition() == null || project.getEdition().getId() == null) {
 			return;
 		}
 
-		if (!teamRepository.existsByIdAndRegisteredEditionsId(project.getTeam().getId(), project.getEdition().getId())) {
+		if (!teamRepository.existsByIdAndRegisteredEditionsId(
+			project.getTeam().getName(),
+			project.getEdition().getId())) {
+
 			throw new DomainValidationException("EDITION_TEAM_MISMATCH",
-					"The referenced team is not registered in the referenced edition");
+				"The referenced team is not registered in the referenced edition");
 		}
 	}
 }

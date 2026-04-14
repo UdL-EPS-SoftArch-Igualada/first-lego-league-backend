@@ -1,5 +1,3 @@
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 package cat.udl.eps.softarch.fll.controller.team;
 
 import cat.udl.eps.softarch.fll.dto.AssignCoachRequest;
