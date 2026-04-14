@@ -1,8 +1,5 @@
 package cat.udl.eps.softarch.fll.exception;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-
 public class TeamCoachAssignmentException extends RuntimeException {
 
 	private final String errorCode;

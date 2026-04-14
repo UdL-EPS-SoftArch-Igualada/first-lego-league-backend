@@ -1,5 +1,3 @@
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 package cat.udl.eps.softarch.fll.steps.team;
 
 import cat.udl.eps.softarch.fll.domain.Team;
@@ -58,7 +56,7 @@ public class TeamSteps {
 
 	@Then("the team {string} should exist in the system")
 	public void theTeamShouldExist(String name) {
-		assertTrue(teamRepository.existsById(name));
+		assertTrue(teamRepository.findbyName(name));
 	}
 
 	@Then("the team should have {int} members")
@@ -129,13 +127,13 @@ public class TeamSteps {
 	}
 
 	@When("I delete the team {string}")
-	public void deleteTeam(String name) {
+	public void deleteTeam(Long name) {
 		teamRepository.deleteById(name);
 	}
 
 	@Then("the team {string} should not exist")
-	public void teamShouldNotExist(String name) {
-		assertFalse(teamRepository.existsById(name));
+	public void teamShouldNotExist(Long id) {
+		assertFalse(teamRepository.existsById(id));
 	}
 
 	@Then("no members should exist in the system")
@@ -151,8 +149,8 @@ public class TeamSteps {
 	}
 
 	@Then("the team {string} should be in {string}")
-	public void verifyTeamCity(String name, String expectedCity) {
-		Team t = teamRepository.findById(id).orElseThrow();
+	public void verifyTeamCity(Long name, String expectedCity) {
+		Team t = teamRepository.findById(name).orElseThrow();
 		assertEquals(expectedCity, t.getCity());
 	}
 

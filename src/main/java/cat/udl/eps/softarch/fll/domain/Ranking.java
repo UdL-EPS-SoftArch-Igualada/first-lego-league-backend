@@ -26,7 +26,7 @@ public class Ranking extends UriEntity<Long> {
 
 	@NotNull
 	@ManyToOne
-	@JoinColumn(name = "team_id", referencedColumnName = "name", nullable = false, unique = true)
+	@JoinColumn(name = "team_name", referencedColumnName = "name", nullable = false, unique = true)
 	@JsonIdentityReference(alwaysAsId = true)
 	private Team team;
 

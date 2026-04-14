@@ -1,12 +1,10 @@
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 package cat.udl.eps.softarch.fll.steps.team;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CyclicBarrier;
@@ -53,7 +51,7 @@ public class TeamEditionRegistrationStepDefs {
 
 	@Given("There is a team named {string} from {string} with category {string}")
 	public void thereIsATeam(String name, String city, String category) {
-		if (!teamRepository.existsById(name)) {
+		if (!teamRepository.existsById(Long.parseLong(name))) {
 			Team team = Team.create(name, city, 2000, category);
 			teamRepository.save(team);
 		}
@@ -63,7 +61,7 @@ public class TeamEditionRegistrationStepDefs {
 	@Transactional
 	public void teamIsAlreadyRegistered(String teamName) {
 		Edition edition = editionRepository.findById(currentEditionId()).orElseThrow();
-		Team team = teamRepository.findById(teamName).orElseThrow();
+		Team team = teamRepository.findById(Long.parseLong(teamName)).orElseThrow();
 		edition.getTeams().add(team);
 		editionRepository.save(edition);
 	}
@@ -74,7 +72,7 @@ public class TeamEditionRegistrationStepDefs {
 		Edition edition = editionRepository.findById(currentEditionId()).orElseThrow();
 		IntStream.range(0, count).forEach(i -> {
 			String teamName = "FillerTeam_" + edition.getId() + "_" + i;
-			Team team = teamRepository.findById(teamName).orElseGet(() -> {
+			Team team = teamRepository.findById(Long.parseLong(teamName)).orElseGet(() -> {
 				Team created = Team.create(teamName, "Igualada", 2000, "Challenge");
 				return teamRepository.save(created);
 			});
@@ -135,17 +133,17 @@ public class TeamEditionRegistrationStepDefs {
 
 	@And("The response has status {string}")
 	public void theResponseHasStatus(String status) throws Exception {
-		stepDefs.result.andExpect(jsonPath("$.status", is(status)));
+		stepDefs.result.andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath("$.status", is(status)));
 	}
 
 	@And("The response has error {string}")
 	public void theResponseHasError(String error) throws Exception {
-		stepDefs.result.andExpect(jsonPath("$.error", is(error)));
+		stepDefs.result.andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath("$.error", is(error)));
 	}
 
 	@And("The response has a non-empty message")
 	public void theResponseHasNonEmptyMessage() throws Exception {
-		stepDefs.result.andExpect(jsonPath("$.message").isNotEmpty());
+		stepDefs.result.andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath("$.message").isNotEmpty());
 	}
 
 	private Long currentEditionId() {

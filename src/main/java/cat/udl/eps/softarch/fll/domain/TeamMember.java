@@ -30,14 +30,12 @@ import java.time.LocalDate;
 public class TeamMember extends UriEntity<Long> {
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include
-    private Long id;
-
-    @NotBlank(message = "Name is mandatory")
-    @Size(min = 3, max = 50, message = "Name must be between 3 and 50 characters")
-    @Column(name = "name", length = 50, unique = true)
-    private String name;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@EqualsAndHashCode.Include
+	private Long id;
+	@NotBlank(message = "Member name is mandatory")
+	@Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
+	private String name;
 	@NotNull(message = "Birth date cannot be null")
 	@Past(message = "Birth date must be in the past")
 	private LocalDate birthDate;
@@ -50,7 +48,7 @@ public class TeamMember extends UriEntity<Long> {
 	@Column(length = 50)
 	private String role;
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "team_id", nullable = false)
+	@JoinColumn(name = "team_name", nullable = false)
 	@NotNull(message = "A member must belong to a team")
 	@JsonIdentityReference(alwaysAsId = true)
 	private Team team;

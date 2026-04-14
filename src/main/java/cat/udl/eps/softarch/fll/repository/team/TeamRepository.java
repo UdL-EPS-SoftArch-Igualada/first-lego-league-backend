@@ -11,8 +11,8 @@ import org.springframework.data.rest.core.annotation.RestResource;
 import cat.udl.eps.softarch.fll.domain.Team;
 
 @RepositoryRestResource(path = "teams")
-public interface TeamRepository extends CrudRepository<Team, String>, PagingAndSortingRepository<Team, String> {
-	
+public interface TeamRepository extends CrudRepository<Team, Long>, PagingAndSortingRepository<Team, Long> {
+
 	List<Team> findByCity(@Param("city") String city);
 
 	List<Team> findByFoundationYearGreaterThan(@Param("year") int year);
@@ -23,12 +23,16 @@ public interface TeamRepository extends CrudRepository<Team, String>, PagingAndS
 
 	List<Team> findByMembersRole(@Param("role") String role);
 
-	Optional<Team> findByName(@Param("name") String name);
+	boolean findbyName(@Param("name") String Name);
+	Optional<Team> findById(Long id);
+
+
+
 
 	@RestResource(exported = false)
-	boolean existsByIdAndRegisteredEditionsId(String teamName, Long editionId);
+	boolean existsByIdAndRegisteredEditionsId(Long teamId, Long editionId);
 
 	@RestResource(exported = false)
-	@Query("select distinct t from Team t left join fetch t.registeredEditions where t.name = :name")
-	Optional<Team> findByNameWithRegisteredEditions(@Param("name") String name);
+	@Query("select distinct t from Team t left join fetch t.registeredEditions where t.id = :id")
+	Optional<Team> findByIdWithRegisteredEditions(@Param("id") Long id);
 }

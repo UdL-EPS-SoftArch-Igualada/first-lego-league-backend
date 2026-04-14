@@ -1,5 +1,3 @@
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 package cat.udl.eps.softarch.fll.steps.team;
 
 import cat.udl.eps.softarch.fll.domain.Team;
@@ -53,7 +51,7 @@ public class TeamMemberStepDefs {
 
 	@Given("a team with name {string} exists for team member management")
 	public void aTeamWithNameExistsForTeamMemberManagement(String teamName) {
-		if (teamRepository.existsById(teamName)) {
+		if (teamRepository.findbyName(teamName)) {
 			return;
 		}
 		Team team = Team.create(teamName, "Igualada", 2005, "Challenge");

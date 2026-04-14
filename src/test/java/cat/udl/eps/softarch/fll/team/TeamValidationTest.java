@@ -1,5 +1,3 @@
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 package cat.udl.eps.softarch.fll.team;
 
 import cat.udl.eps.softarch.fll.domain.DomainValidationException;
