@@ -58,18 +58,14 @@ public class MatchSearchService {
 	}
 
 	public List<MatchSearchItemResponse> findByTeam(String teamUri) {
-
-		Long teamId = Long.valueOf(teamUri.contains("/")
-			? teamUri.substring(teamUri.lastIndexOf('/') + 1)
-			: teamUri);
-
+		Long teamId = Long.parseLong(teamUri.contains("/") ? teamUri.substring(teamUri.lastIndexOf('/') + 1) : teamUri);
 		Team team = teamRepository.findById(teamId)
 			.orElseThrow(() -> new IllegalArgumentException("TEAM_NOT_FOUND"));
-
 		return matchRepository.findByTeam(team).stream()
 			.map(this::toDto)
 			.toList();
 	}
+
 	private MatchSearchItemResponse toDto(Match match) {
 		if (match.getCompetitionTable() == null) {
 			throw new IllegalStateException("Match " + match.getId() + " has no competition table");
