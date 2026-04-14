@@ -10,7 +10,6 @@ import io.cucumber.java.en.When;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 import java.util.stream.IntStream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -25,6 +24,7 @@ public class TeamSteps {
 	private Team currentTeam;
 	private Exception lastException;
 	private List<Team> searchResults;
+	private final java.util.Map<String, Long> teamIdByName = new java.util.HashMap<>();
 
 	public TeamSteps(TeamRepository teamRepository, TeamMemberRepository teamMemberRepository) {
 		this.teamRepository = teamRepository;
@@ -38,6 +38,7 @@ public class TeamSteps {
 		currentTeam = null;
 		lastException = null;
 		searchResults = null;
+		teamIdByName.clear();
 	}
 
 	@Given("I create a team named {string} from {string}")
@@ -53,11 +54,13 @@ public class TeamSteps {
 	@When("I save the team")
 	public void iSaveTheTeam() {
 		currentTeam = teamRepository.save(currentTeam);
+		teamIdByName.put(currentTeam.getName(), currentTeam.getId());
 	}
 
 	@Then("the team {string} should exist in the system")
 	public void theTeamShouldExist(String name) {
-		assertTrue((BooleanSupplier) teamRepository.findbyName(name));
+		boolean exists = teamRepository.findByName(name).isPresent();
+		assertTrue(exists, "Team should exist: " + name);
 	}
 
 	@Then("the team should have {int} members")
@@ -89,7 +92,8 @@ public class TeamSteps {
 		IntStream.range(0, count).forEach(i -> {
 			TeamMember.create("Member " + i, "Student", LocalDate.of(2010, 1, 1), currentTeam);
 		});
-		teamRepository.save(currentTeam);
+		currentTeam = teamRepository.save(currentTeam);
+		teamIdByName.put(name, currentTeam.getId());
 	}
 
 	@When("I try to add another member")
@@ -128,13 +132,22 @@ public class TeamSteps {
 	}
 
 	@When("I delete the team {string}")
-	public void deleteTeam(Long name) {
-		teamRepository.deleteById(name);
+	public void deleteTeam(String teamName) {
+		Long teamId = teamIdByName.get(teamName);
+		if (teamId == null) {
+			teamRepository.findByName(teamName).ifPresent(team -> {
+				teamIdByName.put(teamName, team.getId());
+				teamRepository.deleteById(team.getId());
+			});
+		} else {
+			teamRepository.deleteById(teamId);
+		}
 	}
 
 	@Then("the team {string} should not exist")
-	public void teamShouldNotExist(Long id) {
-		assertFalse(teamRepository.existsById(id));
+	public void teamShouldNotExist(String teamName) {
+		boolean exists = teamRepository.findByName(teamName).isPresent();
+		assertFalse(exists, "Team should not exist: " + teamName);
 	}
 
 	@Then("no members should exist in the system")
@@ -150,9 +163,10 @@ public class TeamSteps {
 	}
 
 	@Then("the team {string} should be in {string}")
-	public void verifyTeamCity(Long name, String expectedCity) {
-		Team t = teamRepository.findById(name).orElseThrow();
-		assertEquals(expectedCity, t.getCity());
+	public void verifyTeamCity(String teamName, String expectedCity) {
+		Team team = teamRepository.findByName(teamName)
+			.orElseThrow(() -> new AssertionError("Team not found: " + teamName));
+		assertEquals(expectedCity, team.getCity());
 	}
 
 	@When("I search for teams in {string}")

@@ -61,7 +61,7 @@ public class TeamEditionRegistrationStepDefs {
 	@Transactional
 	public void teamIsAlreadyRegistered(String teamName) {
 		Edition edition = editionRepository.findById(currentEditionId()).orElseThrow();
-		Team team = teamRepository.findById(Long.parseLong(teamName)).orElseThrow();
+		Team team = teamRepository.findByName(teamName).orElseThrow();
 		edition.getTeams().add(team);
 		editionRepository.save(edition);
 	}
