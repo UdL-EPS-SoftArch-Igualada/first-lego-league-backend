@@ -7,16 +7,7 @@ import java.util.List;
 import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import cat.udl.eps.softarch.fll.domain.volunteer.Floater;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -36,14 +27,17 @@ import lombok.ToString;
 @ToString
 @Table(name = "team")
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-public class Team extends UriEntity<String> {
+public class Team extends UriEntity<Long> {
 
 	@Id
-	@EqualsAndHashCode.Include
-	@NotBlank(message = "Name is mandatory")
-	@Size(min = 3, max = 50, message = "Name must be between 3 and 50 characters")
-	@Column(name = "name", length = 50)
-	private String name;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
+    private Long id;
+
+    @NotBlank(message = "Name is mandatory")
+    @Size(min = 3, max = 50, message = "Name must be between 3 and 50 characters")
+    @Column(name = "name", length = 50, unique = true)
+    private String name;
 	@NotBlank(message = "City is mandatory")
 	@Size(max = 100, message = "City name too long")
 	@Column(name = "city", length = 100)
@@ -65,7 +59,7 @@ public class Team extends UriEntity<String> {
 	@ManyToMany
 	@JoinTable(
 		name = "edition_teams",
-		joinColumns = @JoinColumn(name = "team_name"),
+		joinColumns = @JoinColumn(name = "team_id"),
 		inverseJoinColumns = @JoinColumn(name = "edition_id"))
 	@JsonIdentityReference(alwaysAsId = true)
 	@ToString.Exclude
@@ -73,14 +67,14 @@ public class Team extends UriEntity<String> {
 	@ManyToMany
 	@JoinTable(
 		name = "team_coach",
-		joinColumns = @JoinColumn(name = "team_name"),
+		joinColumns = @JoinColumn(name = "team_id"),
 		inverseJoinColumns = @JoinColumn(name = "coach_id"))
 	@ToString.Exclude
 	private Set<Coach> trainedBy = new HashSet<>();
 	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinTable(
 		name = "team_floaters",
-		joinColumns = @JoinColumn(name = "team_name"),
+		joinColumns = @JoinColumn(name = "team_id"),
 		inverseJoinColumns = @JoinColumn(name = "floater_id"))
 	@ToString.Exclude
 	private Set<Floater> floaters = new HashSet<>();
@@ -103,9 +97,9 @@ public class Team extends UriEntity<String> {
 	}
 
 	@Override
-	public String getId() {
-		return name;
-	}
+	public Long getId() {
+        return id;
+    }
 
 	@PrePersist
 	public void prePersist() {

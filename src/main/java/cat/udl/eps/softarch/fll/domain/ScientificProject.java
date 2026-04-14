@@ -29,7 +29,7 @@ public class ScientificProject extends UriEntity<Long> {
 	private String comments;
 	@NotNull
 	@ManyToOne
-	@JoinColumn(name = "team_name", nullable = false)
+	@JoinColumn(name = "team_id", nullable = false)
 	@JsonIdentityReference(alwaysAsId = true)
 	private Team team;
 	@NotNull

@@ -1,3 +1,5 @@
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 package cat.udl.eps.softarch.fll.steps.team;
 
 import cat.udl.eps.softarch.fll.domain.Team;
@@ -150,7 +152,7 @@ public class TeamSteps {
 
 	@Then("the team {string} should be in {string}")
 	public void verifyTeamCity(String name, String expectedCity) {
-		Team t = teamRepository.findById(name).orElseThrow();
+		Team t = teamRepository.findById(id).orElseThrow();
 		assertEquals(expectedCity, t.getCity());
 	}
 

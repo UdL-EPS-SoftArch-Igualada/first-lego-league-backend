@@ -50,7 +50,7 @@ public class Edition extends UriEntity<Long> {
 	@JoinTable(
 		name = "edition_teams",
 		joinColumns = @JoinColumn(name = "edition_id"),
-		inverseJoinColumns = @JoinColumn(name = "team_name"))
+		inverseJoinColumns = @JoinColumn(name = "team_id"))
 	@ToString.Exclude
 	@EqualsAndHashCode.Exclude
 	private Set<Team> teams = new HashSet<>();

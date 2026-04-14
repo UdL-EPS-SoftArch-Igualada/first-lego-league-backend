@@ -38,7 +38,7 @@ public class Score extends UriEntity<Long> {
 
 	@NotNull
 	@ManyToOne
-	@JoinColumn(name = "team_name")
+	@JoinColumn(name = "team_id")
 	@JsonIdentityReference(alwaysAsId = true)
 	private Team team;
 

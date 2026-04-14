@@ -1,3 +1,5 @@
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 package cat.udl.eps.softarch.fll.steps.team;
 
 import static org.hamcrest.MatcherAssert.assertThat;
