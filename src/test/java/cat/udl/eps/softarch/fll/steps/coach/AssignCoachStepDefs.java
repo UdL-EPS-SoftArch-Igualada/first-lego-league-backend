@@ -26,7 +26,7 @@ public class AssignCoachStepDefs {
 	private final TeamRepository teamRepository;
 	private final CoachRepository coachRepository;
 
-	private final Map<String, String> teamIdMap = new HashMap<>();
+	private final Map<String, Long> teamIdMap = new HashMap<>();
 	private final Map<Integer, Integer> coachIdMap = new HashMap<>();
 
 	public AssignCoachStepDefs(StepDefs stepDefs,
@@ -74,15 +74,15 @@ public class AssignCoachStepDefs {
 
 	@Given("coach {int} is assigned to team {string}")
 	public void coachAssignedToTeam(Integer coachId, String teamName) throws Exception {
-		String teamId = teamIdMap.get(teamName);
-		performAssignCoach(teamId, coachId).andExpect(status().isOk());
+		Long teamId = teamIdMap.get(teamName);
+		performAssignCoach(String.valueOf(teamId), coachId).andExpect(status().isOk());
 	}
 
 	@When("I assign coach {int} to team {string}")
 	public void assignCoach(Integer coachId, String teamName) throws Exception {
-		String teamId = teamIdMap.get(teamName);
+		Long teamId = teamIdMap.get(teamName);
 		Integer persistedCoachId = coachIdMap.getOrDefault(coachId, coachId);
-		stepDefs.result = performAssignCoach(teamId, persistedCoachId);
+		stepDefs.result = performAssignCoach(String.valueOf(teamId), persistedCoachId);
 	}
 
 	@Then("the assignment is successful")
@@ -96,8 +96,8 @@ public class AssignCoachStepDefs {
 		int expectedStatus = switch (error) {
 			case "TEAM_NOT_FOUND", "COACH_NOT_FOUND" -> 404;
 			case "COACH_ALREADY_ASSIGNED",
-				 "MAX_COACHES_PER_TEAM_REACHED",
-				 "MAX_TEAMS_PER_COACH_REACHED" -> 409;
+				"MAX_COACHES_PER_TEAM_REACHED",
+				"MAX_TEAMS_PER_COACH_REACHED" -> 409;
 			default -> 400;
 		};
 

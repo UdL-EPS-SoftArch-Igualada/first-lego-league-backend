@@ -26,6 +26,9 @@ public class VolunteerStepDefs {
 	private Exception lastException;
 	private List<Floater> searchResults;
 
+	// Map para almacenar IDs por nombre de equipo
+	private final java.util.Map<String, Long> teamIdByName = new java.util.HashMap<>();
+
 	public VolunteerStepDefs(FloaterRepository floaterRepository, TeamRepository teamRepository) {
 		this.floaterRepository = floaterRepository;
 		this.teamRepository = teamRepository;
@@ -40,6 +43,7 @@ public class VolunteerStepDefs {
 		currentTeam = null;
 		lastException = null;
 		searchResults = null;
+		teamIdByName.clear();
 	}
 
 	@When("I create a floater with name {string}, email {string}, phone {string} and student code {string}")
@@ -63,17 +67,20 @@ public class VolunteerStepDefs {
 		assertEquals(count, floaterRepository.count());
 	}
 
-
 	@When("I try to assign the floater {string} to team {string}")
 	@Transactional
 	public void tryAssignFloaterToTeam(String studentCode, String teamName) {
 		try {
 			Floater floater = floaterRepository.findByStudentCode(studentCode).orElseThrow();
-			Team team = teamRepository.findByName(teamName).orElseThrow();
-
+			Long teamId = teamIdByName.get(teamName);
+			if (teamId == null) {
+				Team team = teamRepository.findbyName(teamName);
+				teamId = team.getId();
+				teamIdByName.put(teamName, teamId);
+			}
+			Team team = teamRepository.findById(teamId).orElseThrow();
 			team.addFloater(floater);
 			teamRepository.save(team);
-
 		} catch (Exception e) {
 			lastException = e;
 		}
@@ -174,13 +181,20 @@ public class VolunteerStepDefs {
 	public void createTeamForFloaterAssignment(String name, String city) {
 		currentTeam = Team.create(name, city, 2020, "Challenge");
 		currentTeam = teamRepository.save(currentTeam);
+		teamIdByName.put(name, currentTeam.getId());
 	}
 
 	@When("I assign the floater {string} to team {string}")
 	@Transactional
 	public void assignFloaterToTeam(String studentCode, String teamName) {
 		Floater floater = floaterRepository.findByStudentCode(studentCode).orElseThrow();
-		Team team = teamRepository.findByName(teamName).orElseThrow();
+		Long teamId = teamIdByName.get(teamName);
+		if (teamId == null) {
+			Team team = teamRepository.findbyName(teamName);
+			teamId = team.getId();
+			teamIdByName.put(teamName, teamId);
+		}
+		Team team = teamRepository.findById(teamId).orElseThrow();
 		team.addFloater(floater);
 		teamRepository.save(team);
 	}
@@ -188,7 +202,13 @@ public class VolunteerStepDefs {
 	@Then("the team {string} should have {int} floater(s) assigned")
 	@Transactional
 	public void verifyTeamFloaterCount(String teamName, int count) {
-		Team team = teamRepository.findByName(teamName).orElseThrow();
+		Long teamId = teamIdByName.get(teamName);
+		if (teamId == null) {
+			Team team = teamRepository.findbyName(teamName);
+			teamId = team.getId();
+			teamIdByName.put(teamName, teamId);
+		}
+		Team team = teamRepository.findById(teamId).orElseThrow();
 		assertEquals(count, team.getFloaters().size());
 	}
 
@@ -204,7 +224,7 @@ public class VolunteerStepDefs {
 	@Transactional
 	public void removeFloaterFromTeam(String studentCode, String teamName) {
 		Floater floater = floaterRepository.findByStudentCode(studentCode).orElseThrow();
-		Team team = teamRepository.findByName(teamName).orElseThrow();
+		Team team = teamRepository.findbyName(teamName);
 		team.removeFloater(floater);
 		teamRepository.save(team);
 	}

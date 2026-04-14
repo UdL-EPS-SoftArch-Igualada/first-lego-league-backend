@@ -23,7 +23,7 @@ public interface TeamRepository extends CrudRepository<Team, Long>, PagingAndSor
 
 	List<Team> findByMembersRole(@Param("role") String role);
 
-	boolean findbyName(@Param("name") String name);
+	Team findbyName(@Param("name") String name);
 	Optional<Team> findById(Long id);
 
 

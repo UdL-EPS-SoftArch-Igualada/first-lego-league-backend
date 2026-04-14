@@ -44,12 +44,12 @@ public class ScoreStepDefs {
 	private final Map<String, String> teamUriByName = new HashMap<>();
 
 	public ScoreStepDefs(
-			StepDefs stepDefs,
-			RoundRepository roundRepository,
-			MatchRepository matchRepository,
-			MatchResultRepository matchResultRepository,
-			TeamRepository teamRepository,
-			ScoreRepository scoreRepository) {
+		StepDefs stepDefs,
+		RoundRepository roundRepository,
+		MatchRepository matchRepository,
+		MatchResultRepository matchResultRepository,
+		TeamRepository teamRepository,
+		ScoreRepository scoreRepository) {
 		this.stepDefs = stepDefs;
 		this.roundRepository = roundRepository;
 		this.matchRepository = matchRepository;
@@ -77,9 +77,9 @@ public class ScoreStepDefs {
 
 	@Given("a round exists with id {int} and a team {string} participates in round {int}")
 	public void aRoundExistsAndATeamParticipatesInRound(
-			int ignoredRoundId,
-			String teamName,
-			int ignoredRoundIdAgain) {
+		int ignoredRoundId,
+		String teamName,
+		int ignoredRoundIdAgain) {
 		teamUriByName.clear();
 
 		Round round = createRound();
@@ -114,12 +114,12 @@ public class ScoreStepDefs {
 		payload.put("points", points);
 
 		stepDefs.result = stepDefs.mockMvc.perform(
-				post(roundScoresUrl)
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(payload.toString())
-						.characterEncoding(StandardCharsets.UTF_8)
-						.accept(MediaType.APPLICATION_JSON)
-						.with(AuthenticationStepDefs.authenticate()));
+			post(roundScoresUrl)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(payload.toString())
+				.characterEncoding(StandardCharsets.UTF_8)
+				.accept(MediaType.APPLICATION_JSON)
+				.with(AuthenticationStepDefs.authenticate()));
 	}
 
 	@When("I submit {int} points for a non participating team")
@@ -129,12 +129,12 @@ public class ScoreStepDefs {
 		payload.put("points", points);
 
 		stepDefs.result = stepDefs.mockMvc.perform(
-				post(roundScoresUrl)
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(payload.toString())
-						.characterEncoding(StandardCharsets.UTF_8)
-						.accept(MediaType.APPLICATION_JSON)
-						.with(AuthenticationStepDefs.authenticate()));
+			post(roundScoresUrl)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(payload.toString())
+				.characterEncoding(StandardCharsets.UTF_8)
+				.accept(MediaType.APPLICATION_JSON)
+				.with(AuthenticationStepDefs.authenticate()));
 	}
 
 	@When("I submit {int} points for team {string} in round {int}")
@@ -147,20 +147,20 @@ public class ScoreStepDefs {
 		payload.put("points", points);
 
 		stepDefs.result = stepDefs.mockMvc.perform(
-				post(roundScoresUrl)
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(payload.toString())
-						.characterEncoding(StandardCharsets.UTF_8)
-						.accept(MediaType.APPLICATION_JSON)
-						.with(AuthenticationStepDefs.authenticate()));
+			post(roundScoresUrl)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(payload.toString())
+				.characterEncoding(StandardCharsets.UTF_8)
+				.accept(MediaType.APPLICATION_JSON)
+				.with(AuthenticationStepDefs.authenticate()));
 	}
 
 	@When("I request the scores for the round")
 	public void iRequestTheScoresForTheRound() throws Exception {
 		stepDefs.result = stepDefs.mockMvc.perform(
-				get(roundScoresUrl)
-						.accept(MediaType.APPLICATION_JSON)
-						.with(AuthenticationStepDefs.authenticate()));
+			get(roundScoresUrl)
+				.accept(MediaType.APPLICATION_JSON)
+				.with(AuthenticationStepDefs.authenticate()));
 	}
 
 	@When("I request the scores for round {int}")
@@ -172,13 +172,13 @@ public class ScoreStepDefs {
 	@When("I update the score to {int} for team {string} in round {int}")
 	public void iUpdateTheScoreToForTeamInRound(int newPoints, String teamReference, int roundIdParam) throws Exception {
 		String teamUri = resolveTeamUri(teamReference);
-		String teamId = extractTeamId(teamUri);
+		Long teamId = Long.parseLong(extractTeamId(teamUri));
 
 		Long scoreId = scoreRepository.findByRound_Id((long) roundIdParam).stream()
-				.filter(s -> s.getTeam().getId().equals(teamId))
-				.map(Score::getId)
-				.findFirst()
-				.orElseThrow(() -> new RuntimeException("Score not found for team " + teamId + " in round " + roundIdParam));
+			.filter(s -> s.getTeam().getId().equals(teamId))
+			.map(Score::getId)
+			.findFirst()
+			.orElseThrow(() -> new RuntimeException("Score not found for team " + teamId + " in round " + roundIdParam));
 
 		String url = "/rounds/" + roundIdParam + "/scores/" + scoreId;
 
@@ -186,31 +186,31 @@ public class ScoreStepDefs {
 		payload.put("points", newPoints);
 
 		stepDefs.result = stepDefs.mockMvc.perform(
-				patch(url)
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(payload.toString())
-						.characterEncoding(StandardCharsets.UTF_8)
-						.accept(MediaType.APPLICATION_JSON)
-						.with(AuthenticationStepDefs.authenticate()));
+			patch(url)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(payload.toString())
+				.characterEncoding(StandardCharsets.UTF_8)
+				.accept(MediaType.APPLICATION_JSON)
+				.with(AuthenticationStepDefs.authenticate()));
 	}
 
 	@When("I delete the score for team {string} in round {int}")
 	public void iDeleteTheScoreForTeamInRound(String teamReference, int roundIdParam) throws Exception {
 		String teamUri = resolveTeamUri(teamReference);
-		String teamId = extractTeamId(teamUri);
+		Long teamId = Long.parseLong(extractTeamId(teamUri));
 
 		Long scoreId = scoreRepository.findByRound_Id((long) roundIdParam).stream()
-				.filter(s -> s.getTeam().getId().equals(teamId))
-				.map(Score::getId)
-				.findFirst()
-				.orElseThrow(() -> new RuntimeException("Score not found for team " + teamId + " in round " + roundIdParam));
+			.filter(s -> s.getTeam().getId().equals(teamId))
+			.map(Score::getId)
+			.findFirst()
+			.orElseThrow(() -> new RuntimeException("Score not found for team " + teamId + " in round " + roundIdParam));
 
 		String url = "/rounds/" + roundIdParam + "/scores/" + scoreId;
 
 		stepDefs.result = stepDefs.mockMvc.perform(
-				delete(url)
-						.accept(MediaType.APPLICATION_JSON)
-						.with(AuthenticationStepDefs.authenticate()));
+			delete(url)
+				.accept(MediaType.APPLICATION_JSON)
+				.with(AuthenticationStepDefs.authenticate()));
 	}
 
 	private Round createRound() {
@@ -236,9 +236,9 @@ public class ScoreStepDefs {
 		match = matchRepository.save(match);
 		matchUri = "http://localhost/matches/" + match.getId();
 
-		String teamId = extractTeamId(teamUri);
+		Long teamId = Long.parseLong(extractTeamId(teamUri));
 		Team team = teamRepository.findById(teamId)
-				.orElseThrow(() -> new RuntimeException("TEAM NOT FOUND: " + teamId));
+			.orElseThrow(() -> new RuntimeException("TEAM NOT FOUND: " + teamId));
 
 		MatchResult matchResult = MatchResult.create(initialScore, match, team);
 

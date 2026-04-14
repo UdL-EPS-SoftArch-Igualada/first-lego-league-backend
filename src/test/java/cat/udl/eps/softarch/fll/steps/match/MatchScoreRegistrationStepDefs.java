@@ -67,23 +67,23 @@ public class MatchScoreRegistrationStepDefs {
 
 	@When("^I register a final score of (-?\\d+) for team A and (-?\\d+) for team B$")
 	public void iRegisterAFinalScoreForTeams(int teamAScore, int teamBScore) throws Throwable {
-		postRegisterScorePayload(match.getId(), teamA.getId(), teamB.getId(), teamAScore, teamBScore);
+		postRegisterScorePayload(match.getId(), String.valueOf(teamA.getId()), String.valueOf(teamB.getId()), teamAScore, teamBScore);
 	}
 
 	@When("^I register a score for a non existing match$")
 	public void iRegisterAScoreForANonExistingMatch() throws Throwable {
-		postRegisterScorePayload(Long.MAX_VALUE, teamA.getId(), teamB.getId(), 120, 95);
+		postRegisterScorePayload(Long.MAX_VALUE, String.valueOf(teamA.getId()), String.valueOf(teamB.getId()), 120, 95);
 	}
 
 	@When("^I register a final score with mismatched teams$")
 	public void iRegisterAFinalScoreWithMismatchedTeams() throws Throwable {
 		Team outsider = createTeam("Outsider-" + UUID.randomUUID().toString().substring(0, 8));
-		postRegisterScorePayload(match.getId(), outsider.getId(), teamB.getId(), 120, 95);
+		postRegisterScorePayload(match.getId(), String.valueOf(outsider.getId()), String.valueOf(teamB.getId()), 120, 95);
 	}
 
 	@When("^I register a final score using the same team for both sides$")
 	public void iRegisterAFinalScoreUsingTheSameTeamForBothSides() throws Throwable {
-		postRegisterScorePayload(match.getId(), teamA.getId(), teamA.getId(), 120, 95);
+		postRegisterScorePayload(match.getId(), String.valueOf(teamA.getId()), String.valueOf(teamA.getId()), 120, 95);
 	}
 
 	@When("^I register a final score with null score payload$")
@@ -129,9 +129,9 @@ public class MatchScoreRegistrationStepDefs {
 	@Then("^The match score error response has code \"([^\"]*)\"$")
 	public void theMatchScoreErrorResponseHasCode(String errorCode) throws Throwable {
 		stepDefs.result
-				.andExpect(jsonPath("$.error").value(errorCode))
-				.andExpect(jsonPath("$.timestamp").exists())
-				.andExpect(jsonPath("$.path").value("/matchResults/register"));
+			.andExpect(jsonPath("$.error").value(errorCode))
+			.andExpect(jsonPath("$.timestamp").exists())
+			.andExpect(jsonPath("$.path").value("/matchResults/register"));
 	}
 
 	private void postRegisterScorePayload(Long matchId, String payloadTeamAId, String payloadTeamBId, int payloadTeamAScore, int payloadTeamBScore)
