@@ -23,14 +23,18 @@ public interface TeamRepository extends CrudRepository<Team, Long>, PagingAndSor
 
 	List<Team> findByMembersRole(@Param("role") String role);
 
-	Team findbyName(@Param("name") String name);
+	Optional<Team> findByName(@Param("name") String name);
+
+	@Deprecated
+	default Team findbyName(String name) {
+		return findByName(name).orElse(null);
+	}
+
 	Optional<Team> findById(Long id);
 
-
-
-
 	@RestResource(exported = false)
-	boolean existsByIdAndRegisteredEditionsId(Long teamId, Long editionId);
+	@Query("SELECT CASE WHEN COUNT(t) > 0 THEN true ELSE false END FROM Team t JOIN t.registeredEditions e WHERE t.id = :teamId AND e.id = :editionId")
+	boolean existsByIdAndRegisteredEditionsId(@Param("teamId") Long teamId, @Param("editionId") Long editionId);
 
 	@RestResource(exported = false)
 	@Query("select distinct t from Team t left join fetch t.registeredEditions where t.id = :id")
