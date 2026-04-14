@@ -1,5 +1,6 @@
 package cat.udl.eps.softarch.fll.service;
 
+import cat.udl.eps.softarch.fll.service.edition.EditionLifecycleService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import cat.udl.eps.softarch.fll.domain.Edition;
