@@ -1,6 +1,6 @@
 package cat.udl.eps.softarch.fll.domain;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,7 +40,7 @@ public class Round extends UriEntity<Long> {
 	private Edition edition;
 
 	@OneToMany(mappedBy = "round", cascade = CascadeType.ALL, orphanRemoval = true)
-	@JsonManagedReference("round-matches")
+	@JsonIgnore
 	@Setter(lombok.AccessLevel.NONE)
 	private List<Match> matches = new ArrayList<>();
 

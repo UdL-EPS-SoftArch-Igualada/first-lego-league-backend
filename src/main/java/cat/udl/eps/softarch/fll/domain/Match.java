@@ -35,7 +35,6 @@ public class Match extends UriEntity<Long> {
 	private LocalTime endTime;
 
 	@Getter
-	@JsonBackReference("round-matches")
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "round_id")
 	private Round round;
