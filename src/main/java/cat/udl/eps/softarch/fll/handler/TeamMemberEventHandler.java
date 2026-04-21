@@ -11,20 +11,22 @@ import org.springframework.stereotype.Component;
 @RepositoryEventHandler
 public class TeamMemberEventHandler {
 
-    private final TeamMemberRepository teamMemberRepository;
+	private final TeamMemberRepository teamMemberRepository;
 
-    public TeamMemberEventHandler(TeamMemberRepository teamMemberRepository) {
-        this.teamMemberRepository = teamMemberRepository;
-    }
+	public TeamMemberEventHandler(TeamMemberRepository teamMemberRepository) {
+		this.teamMemberRepository = teamMemberRepository;
+	}
 
-    @HandleBeforeCreate
-    public void handleTeamMemberBeforeCreate(TeamMember member) {
-        if (member.getTeam() == null) return;
-        if (teamMemberRepository.countByTeam(member.getTeam()) >= 10) {
-            throw new DomainValidationException(
-                "TEAM_CAPACITY_EXCEEDED",
-                "A team cannot have more than 10 members"
-            );
-        }
-    }
+	@HandleBeforeCreate
+	public void handleTeamMemberBeforeCreate(TeamMember member) {
+		if (member.getTeam() == null) {
+			return;
+		}
+		if (teamMemberRepository.countByTeam(member.getTeam()) >= 10) {
+			throw new DomainValidationException(
+				"TEAM_CAPACITY_EXCEEDED",
+				"A team cannot have more than 10 members"
+			);
+		}
+	}
 }
