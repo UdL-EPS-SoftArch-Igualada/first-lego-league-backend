@@ -210,7 +210,7 @@ async function handleInboxUnlabeled({ github, context, core }) {
 
 	await setProjectItemSingleSelect(github, project.id, itemId, status.fieldId, backlogOptionId);
 
-	await addLabels(github, context, ["backlog"]);
+	await addLabels(github, context, ["backlog", COIN_LABEL]);
 
 	await addComment(
 		github,

@@ -1,7 +1,7 @@
 name: New feature
 description: Create a task for developing new features.
 title: "[Feat]: "
-labels: ["inbox", "🪙"]
+labels: ["inbox"]
 projects: ["UdL-EPS-SoftArch-Igualada/4"]
 type: feature
 body:

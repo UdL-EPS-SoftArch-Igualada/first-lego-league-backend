@@ -1,7 +1,7 @@
 name: Refactor
 description: Create a task for refactoring code.
 title: "[Refactor]: "
-labels: ["inbox", "🪙"]
+labels: ["inbox"]
 projects: ["UdL-EPS-SoftArch-Igualada/4"]
 type: refactor
 body:
