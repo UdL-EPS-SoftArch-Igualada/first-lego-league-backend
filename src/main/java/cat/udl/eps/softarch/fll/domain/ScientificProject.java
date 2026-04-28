@@ -38,6 +38,10 @@ public class ScientificProject extends UriEntity<Long> {
 	@JsonIdentityReference(alwaysAsId = true)
 	private Edition edition;
 
+	@ManyToOne
+	@JoinColumn(name = "project_room_id")
+	private ProjectRoom projectRoom;
+
 	public static ScientificProject create(Integer score) {
 		DomainValidation.requireNonNegative(score, "score");
 
