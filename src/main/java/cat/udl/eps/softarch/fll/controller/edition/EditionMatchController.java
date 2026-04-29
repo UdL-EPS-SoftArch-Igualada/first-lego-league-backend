@@ -23,6 +23,9 @@ public class EditionMatchController {
 			var embedded = Map.of("matches", matches);
 			return ResponseEntity.ok(Map.of("_embedded", embedded));
 		} catch (IllegalArgumentException ex) {
+			if (!"EDITION_NOT_FOUND".equals(ex.getMessage())) {
+				throw ex;
+			}
 			return ResponseEntity.status(404)
 				.body(Map.of(
 					"error", ex.getMessage(),
