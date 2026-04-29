@@ -13,6 +13,7 @@ import cat.udl.eps.softarch.fll.domain.team.Team;
 import cat.udl.eps.softarch.fll.repository.match.MatchRepository;
 import cat.udl.eps.softarch.fll.repository.match.specification.MatchSpecifications;
 import cat.udl.eps.softarch.fll.repository.team.TeamRepository;
+import cat.udl.eps.softarch.fll.repository.edition.EditionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 
@@ -22,6 +23,7 @@ public class MatchSearchService {
 
 	private final MatchRepository matchRepository;
 	private final TeamRepository teamRepository;
+	private final EditionRepository editionRepository;
 
 	public Page<MatchSearchItemResponse> searchMatches(
 		LocalTime startFrom,
@@ -62,6 +64,14 @@ public class MatchSearchService {
 		Team team = teamRepository.findById(teamName)
 			.orElseThrow(() -> new IllegalArgumentException("TEAM_NOT_FOUND"));
 		return matchRepository.findByTeam(team).stream()
+			.map(this::toDto)
+			.toList();
+	}
+
+	public List<MatchSearchItemResponse> findByEditionId(Long editionId) {
+		editionRepository.findById(editionId)
+			.orElseThrow(() -> new IllegalArgumentException("EDITION_NOT_FOUND"));
+		return matchRepository.findByEditionId(editionId).stream()
 			.map(this::toDto)
 			.toList();
 	}

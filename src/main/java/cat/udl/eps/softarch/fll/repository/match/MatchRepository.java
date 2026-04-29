@@ -91,4 +91,14 @@ public interface MatchRepository extends
 		""")
 	@RestResource(exported = false)
 	List<Match> findScheduledTableMatchesByEditionId(@Param("editionId") Long editionId);
+
+	@Query("""
+		SELECT DISTINCT m FROM Match m
+		LEFT JOIN m.teamA tA
+		LEFT JOIN m.teamB tB
+		WHERE tA.edition.id = :editionId
+		OR tB.edition.id = :editionId
+		""")
+	@RestResource(exported = false)
+	List<Match> findByEditionId(@Param("editionId") Long editionId);
 }
