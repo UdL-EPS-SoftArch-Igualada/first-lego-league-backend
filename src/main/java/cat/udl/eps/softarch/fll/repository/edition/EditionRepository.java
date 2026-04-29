@@ -5,18 +5,17 @@ import java.util.Optional;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 import cat.udl.eps.softarch.fll.domain.edition.Edition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 @Tag(name = "Editions", description = "Repository for managing Edition entities")
 @RepositoryRestResource
-public interface EditionRepository extends CrudRepository<Edition, Long>, PagingAndSortingRepository<Edition, Long> {
+public interface EditionRepository extends JpaRepository<Edition, Long> {
 
 	@RestResource(exported = false)
 	@Lock(LockModeType.PESSIMISTIC_WRITE)

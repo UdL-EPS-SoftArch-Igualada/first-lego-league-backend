@@ -1,8 +1,13 @@
 spring:
   h2:
     console:
-      enabled: false
-
+      enabled: true
+  jpa:
+    defer-datasource-initialization: true 
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update 
+  
 server:
   error:
     include-message: always
@@ -13,10 +18,6 @@ default-password: password
 ---
 
 spring:
-  jpa:
-    generate-ddl: true
-    hibernate:
-      ddl-auto: update
   config:
     activate:
       on-profile: prod
