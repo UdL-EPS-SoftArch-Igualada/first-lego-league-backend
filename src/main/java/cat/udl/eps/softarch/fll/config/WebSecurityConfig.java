@@ -38,6 +38,7 @@ public class WebSecurityConfig {
 				.requestMatchers(HttpMethod.POST, "/projectRooms").hasRole(UserRoles.ADMIN)
 				.requestMatchers(HttpMethod.POST, "/**").hasRole(UserRoles.ADMIN)
 				.requestMatchers(HttpMethod.PUT, "/**").hasRole(UserRoles.ADMIN)
+				.requestMatchers(HttpMethod.PATCH, "/matches/*/state").authenticated()
 				.requestMatchers(HttpMethod.PATCH, "/**").hasRole(UserRoles.ADMIN)
 				.requestMatchers(HttpMethod.DELETE, "/**").hasRole(UserRoles.ADMIN)
 
