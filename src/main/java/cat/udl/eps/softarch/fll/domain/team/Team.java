@@ -121,8 +121,11 @@ public class Team extends UriEntity<String> {
 	}
 
 	public void addFloater(Floater floater) {
+		if (floater == null) {
+			throw new IllegalStateException("FLOATER_NOT_FOUND");
+		}
 		if (floaters.contains(floater)) {
-			return;
+			throw new IllegalStateException("FLOATER_ALREADY_ASSIGNED");
 		}
 		if (floaters.size() >= 2) {
 			throw new IllegalStateException("A team cannot have more than 2 floaters");
