@@ -30,11 +30,16 @@ public class UserEventHandler {
 	@HandleBeforeCreate
 	public void handleUserPreCreate(User user) {
 		logger.info("Before creating: {}", user);
+		user.encodePassword();
 	}
 
 	@HandleBeforeSave
 	public void handleUserPreSave(User user) {
 		logger.info("Before updating: {}", user);
+		if (user.isPasswordReset()) {
+			user.encodePassword();
+			user.setPasswordReset(false);
+		}
 	}
 
 	@HandleBeforeDelete
@@ -50,17 +55,11 @@ public class UserEventHandler {
 	@HandleAfterCreate
 	public void handleUserPostCreate(User user) {
 		logger.info("After creating: {}", user);
-		user.encodePassword();
-		userRepository.save(user);
 	}
 
 	@HandleAfterSave
 	public void handleUserPostSave(User user) {
 		logger.info("After updating: {}", user);
-		if (user.isPasswordReset()) {
-			user.encodePassword();
-		}
-		userRepository.save(user);
 	}
 
 	@HandleAfterDelete
