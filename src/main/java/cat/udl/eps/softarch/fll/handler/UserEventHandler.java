@@ -35,6 +35,9 @@ public class UserEventHandler {
 	@HandleBeforeSave
 	public void handleUserPreSave(User user) {
 		logger.info("Before updating: {}", user);
+		if (user.isPasswordPlainText()) {
+			user.setPasswordReset(true);
+		}
 	}
 
 	@HandleBeforeDelete

@@ -1,7 +1,5 @@
 package cat.udl.eps.softarch.fll.domain.identity;
 
-import cat.udl.eps.softarch.fll.domain.DomainValidation;
-import cat.udl.eps.softarch.fll.domain.UriEntity;
 import java.util.Collection;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,6 +9,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
+import cat.udl.eps.softarch.fll.domain.DomainValidation;
+import cat.udl.eps.softarch.fll.domain.UriEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -62,6 +62,10 @@ public class User extends UriEntity<String> implements UserDetails {
 
 	public void encodePassword() {
 		this.password = passwordEncoder.encode(this.password);
+	}
+
+	public boolean isPasswordPlainText() {
+		return password != null && !password.startsWith("$2");
 	}
 
 	@Override
