@@ -5,7 +5,6 @@ import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
 import org.springframework.stereotype.Component;
 import cat.udl.eps.softarch.fll.domain.edition.Edition;
 import cat.udl.eps.softarch.fll.domain.edition.Venue;
-import cat.udl.eps.softarch.fll.exception.DomainValidationException;
 import cat.udl.eps.softarch.fll.repository.edition.VenueRepository;
 
 @Component
@@ -27,16 +26,9 @@ public class EditionEventHandler {
 		if (venueName == null || venueName.isBlank()) {
 			return;
 		}
+		String venueCity = edition.getInputVenueCity() != null ? edition.getInputVenueCity() : venueName;
 		Venue venue = venueRepository.findByName(venueName)
-			.orElseGet(() -> createNewVenue(venueName, edition.getInputVenueCity()));
+			.orElseGet(() -> venueRepository.save(Venue.create(venueName, venueCity)));
 		edition.setVenue(venue);
-	}
-
-	private Venue createNewVenue(String name, String city) {
-		if (city == null || city.isBlank()) {
-			throw new DomainValidationException("VENUE_CITY_REQUIRED",
-				"Venue '" + name + "' does not exist. Provide 'venueCity' to create a new venue.");
-		}
-		return venueRepository.save(Venue.create(name, city));
 	}
 }
